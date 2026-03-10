@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teclipse Education Hub</title>
+    <link rel="icon" type="image/png" href="teclipse.png">
+    <meta name="description"
+        content="Build Your Career in Technology with Teclipse Education Hub. Expert-led courses in Programming, AI, and Full Stack Development.">
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Boxicons for minimal icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        .enquire-btn {
+            background-color: var(--primary-color);
+            color: #fff !important;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            text-align: center;
+            display: inline-block;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            width: 100%;
+            margin-top: 0.75rem;
+        }
+
+        .enquire-btn:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .tech-partner-badge {
+            margin-top: 1.5rem;
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-color);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .contact-link-ui {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            transition: background 0.3s;
+        }
+
+        .contact-link-ui:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="teclipse.png" alt="Teclipse Education Hub" class="logo-img"
+                    onerror="this.style.display='none'">
+                <div class="logo-text" id="fallback-logo">
+                    Teclipse
+                    <span>Education Hub</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#benefits">Benefits</a></li>
+                <li><a href="#courses">Courses</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#achievements">Achievements</a></li>
+                <li><a href="#reviews">Reviews</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+                    <i class='bx bx-moon' id="theme-icon"></i>
+                </button>
+                <button id="login-btn" class="btn btn-login">Admin Login</button>
+
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn icon-btn" id="mobile-menu-btn" aria-label="Menu">
+                    <i class='bx bx-menu'></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Sidebar -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <div class="mobile-sidebar" id="mobile-sidebar">
+        <div class="sidebar-header">
+            <div class="logo-text" style="font-size: 1.25rem;">
+                Teclipse
+                <span>Education Hub</span>
+            </div>
+            <button id="close-sidebar" class="icon-btn"><i class='bx bx-x'></i></button>
+        </div>
+        <ul class="mobile-links">
+            <li><a href="#home" class="mobile-nav-link">Home</a></li>
+            <li><a href="#benefits" class="mobile-nav-link">Benefits</a></li>
+            <li><a href="#courses" class="mobile-nav-link">Courses</a></li>
+            <li><a href="#about" class="mobile-nav-link">About</a></li>
+            <li><a href="#achievements" class="mobile-nav-link">Achievements</a></li>
+            <li><a href="#reviews" class="mobile-nav-link">Reviews</a></li>
+            <li>
+                <hr style="border:0; border-top: 1px solid var(--border-color); margin: 10px 0;">
+            </li>
+            <li><a href="#" id="mobile-login-btn" class="mobile-nav-link" style="color: var(--primary-color);">Admin
+                    Login</a></li>
+        </ul>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal">&times;</span>
+            <h2 style="margin-bottom: 0.5rem; color: var(--primary-color);">Admin Portal</h2>
+            <p style="margin-bottom: 2rem; font-size: 0.95rem;">Requires authorized login details</p>
+            <form id="admin-login-form" class="form">
+                <div class="input-group">
+                    <label for="admin-email">Email Address</label>
+                    <input type="email" id="admin-email" placeholder="admin@domain.com" required>
+                </div>
+                <div class="input-group" style="margin-bottom: 0.5rem;">
+                    <label for="admin-pass">Password</label>
+                    <input type="password" id="admin-pass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Secure Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Build Your Career in <span>Technology</span></h1>
+            <p class="hero-subtitle">Master Programming, AI, Full Stack Development, and Data Analytics. Structured
+                learning to bridge the gap between passion and profession.</p>
+            <div class="hero-btns">
+                <a href="#courses" class="btn btn-primary">Explore Courses</a>
+                <a href="https://wa.me/919943150099?text=I%20have%20interested%20about%20teclipse%20please%20share%20about!!"
+                    class="btn btn-outline">Enquire Now</a>
+            </div>
+        </div>
+        <div class="hero-illustration">
+            <div class="abstract-tech">
+                <div class="tech-ring ring-1"></div>
+                <div class="tech-ring ring-2"></div>
+                <div class="tech-node center-node"></div>
+                <div class="tech-node satellite-1"></div>
+                <div class="tech-node satellite-2"></div>
+                <div class="tech-node satellite-3"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vision & Mission Section -->
+    <section id="vision-mission" class="benefits bg-secondary" style="padding-top: 3rem;">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Vision & Mission</h2>
+                <p>Bridging the gap between digital learning and physical mentorship.</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="icon-wrapper"><i class='bx bx-target-lock'></i></div>
+                    <h3>Our Vision</h3>
+                    <p>To be the most trusted name in technical skill development, recognized for making elite tech
+                        education affordable and bridging the gap between digital learning and physical mentorship.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon-wrapper"><i class='bx bx-rocket'></i></div>
+                    <h3>Our Mission</h3>
+                    <p><strong>Democratizing Tech:</strong> Provide top-tier training at an Affordable
+                        Price.<br /><br />
+                        <strong>Future-Ready Curriculum:</strong> Deliver an Advanced Syllabus prioritized by
+                        industry.<br /><br />
+                        <strong>Hybrid Excellence:</strong> Evolving to Offline-Based Support for localized hands-on
+                        learning.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Teclipse Advantage Section -->
+    <section id="benefits" class="benefits" style="padding-top: 3rem;">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>The Teclipse Advantage</h2>
+                <p>Choosing Teclipse means choosing depth with value.</p>
+            </div>
+            <div class="benefits-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                <div class="benefit-card">
+                    <div class="icon-wrapper"><i class='bx bx-wallet'></i></div>
+                    <h3>Affordable Pricing</h3>
+                    <p>Premium education without the premium price tag. Flexible paths designed for your budget.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon-wrapper"><i class='bx bx-brain'></i></div>
+                    <h3>Advanced Syllabus</h3>
+                    <p>Beyond basics. Cover complex architectures, modern best practices, and the "why" behind the code.
+                    </p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon-wrapper"><i class='bx bx-buildings'></i></div>
+                    <h3>Offline Support</h3>
+                    <p>Currently evolving! Soon offering offline support and physical consultation centers.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon-wrapper"><i class='bx bx-code-block'></i></div>
+                    <h3>Project-Centric</h3>
+                    <p>Build real-world applications solving actual problems, not just "hello world" exercises.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon-wrapper"><i class='bx bx-user-voice'></i></div>
+                    <h3>Mentorship</h3>
+                    <p>1-on-1 sessions, study materials (PPTs), ensuring you never feel lost.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon-wrapper"><i class='bx bx-medal'></i></div>
+                    <h3>Placement Prep</h3>
+                    <p>Valuable Completion Certificate and targeted interview-based training for your dream role.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section id="courses" class="courses bg-secondary">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Our Specialized Course Tracks</h2>
+                <p>Comprehensive modular tracks designed for your success</p>
+            </div>
+            <div class="course-categories">
+                <!-- Core & Advanced Coding -->
+                <div class="category">
+                    <h3 class="category-title">Core & Advanced Coding</h3>
+                    <div class="course-grid">
+                        <div class="course-card">
+                            <i class='bx bxl-python course-icon'></i>
+                            <h4>Python</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20Python%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                        <div class="course-card">
+                            <i class='bx bxl-java course-icon'></i>
+                            <h4>Java</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20Java%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                        <div class="course-card">
+                            <i class='bx bx-code-alt course-icon'></i>
+                            <h4>C/C++</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20C%2FC%2B%2B%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                        <div class="course-card">
+                            <i class='bx bx-code-block course-icon'></i>
+                            <h4>R Programming</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20R%20Programming%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Full Stack Mastery -->
+                <div class="category">
+                    <h3 class="category-title">Full Stack Mastery</h3>
+                    <div class="course-grid">
+                        <div class="course-card">
+                            <i class='bx bxl-html5 course-icon'></i>
+                            <h4>Front End Dev</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20Front%20End%20Development%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                        <div class="course-card">
+                            <i class='bx bxl-nodejs course-icon'></i>
+                            <h4>Back End Dev</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20Back%20End%20Development%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                        <div class="course-card">
+                            <i class='bx bx-layer course-icon'></i>
+                            <h4>Python Stack</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20Python%20Full%20Stack%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                        <div class="course-card">
+                            <i class='bx bxl-php course-icon'></i>
+                            <h4>PHP Stack</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20PHP%20Stack%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Data Intelligence -->
+                <div class="category">
+                    <h3 class="category-title">Data Intelligence</h3>
+                    <div class="course-grid">
+                        <div class="course-card">
+                            <i class='bx bx-line-chart course-icon'></i>
+                            <h4>Data Science</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20Data%20Science%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                        <div class="course-card">
+                            <i class='bx bx-bar-chart-alt-2 course-icon'></i>
+                            <h4>Data Analytics</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20Data%20Analytics%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                        <div class="course-card">
+                            <i class='bx bx-stats course-icon'></i>
+                            <h4>Power BI</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20Power%20BI%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                        <div class="course-card">
+                            <i class='bx bx-table course-icon'></i>
+                            <h4>Tableau & SQL</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20Tableau%20and%20SQL%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- The Future of Tech -->
+                <div class="category">
+                    <h3 class="category-title">The Future of Tech</h3>
+                    <div class="course-grid">
+                        <div class="course-card">
+                            <i class='bx bx-brain course-icon'></i>
+                            <h4>AI & ML</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20AI%20and%20Machine%20Learning%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                        <div class="course-card">
+                            <i class='bx bx-git-branch course-icon'></i>
+                            <h4>DSA</h4>
+                            <a href="https://wa.me/919943150099?text=I'm%20interested%20in%20the%20Data%20Structures%20Course!"
+                                class="enquire-btn">Enquire Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="section-container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>About Teclipse Education Hub</h2>
+
+                    <p>At <strong>Teclipse Education Hub</strong>, we believe that high-quality tech education should be
+                        both cutting-edge and accessible.</p>
+
+                    <p>Founded by <strong>P. Esai Yazhini</strong> and <strong>A. Mohammed Aslam</strong>.
+                        With technical support and innovation from <strong>Mohamed Irfan M</strong>, the
+                        <strong>Tech Partner</strong>, Teclipse is designed to be a premier launchpad for the next
+                        generation of developers, data scientists, and engineers.
+                    </p>
+
+                    <p>The platform focuses on building modern digital learning solutions and
+                        advanced technology-driven education systems.</p>
+
+                    <p>We distinguish ourselves by offering an <strong>Advanced Syllabus</strong> that is constantly
+                        updated to match the rapid shifts in the global tech industry. Whether you are a student
+                        starting from scratch or a professional looking to upskill, Teclipse provides the roadmap you
+                        need to master the digital landscape.</p>
+                </div>
+                <div class="about-gallery">
+                    <div class="gallery-img img-1"></div>
+                    <div class="gallery-img img-2"
+                        style="background-image: url('teh.png'); background-size: cover; background-repeat: no-repeat; background-position: center; background-color: var(--card-bg);">
+                    </div>
+                    <div class="gallery-img img-3"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section id="achievements" class="achievements bg-secondary">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Our Achievements</h2>
+                <p>Moments of excellence and pride at Teclipse</p>
+            </div>
+            <div class="achievements-gallery" id="achievements-gallery">
+                <!-- JS will inject uploaded photos here -->
+                <div style="text-align: center; width: 100%; grid-column: 1 / -1; color: var(--text-muted);">
+                    <p>No achievements uploaded yet.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews / Testimonials Slider -->
+    <section id="reviews" class="reviews">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Student Testimonials</h2>
+                <p>Read what our successful learners have to say about their experience in our campus</p>
+            </div>
+
+            <div class="testimonial-slider-container">
+                <button id="prev-btn" class="slider-btn"><i class='bx bx-chevron-left'></i></button>
+                <div class="testimonial-slider" id="testimonial-slider">
+                    <!-- Slides injected by JS -->
+                </div>
+                <button id="next-btn" class="slider-btn"><i class='bx bx-chevron-right'></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feedback Section -->
+    <section id="feedback" class="feedback bg-secondary">
+        <div class="section-container">
+            <div class="feedback-wrapper">
+                <div class="feedback-info">
+                    <h2>Leave Your Feedback</h2>
+                    <p>Your thoughts help us shape a better learning experience. Submit your feedback and everyone can
+                        see it along with your picture on our student board.</p>
+                </div>
+                <div class="feedback-form-container">
+                    <form id="feedback-form" class="form" action="https://api.web3forms.com/submit" method="POST">
+                        <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+                        <input type="hidden" name="subject" value="New Student Feedback - Teclipse">
+                        <input type="hidden" name="from_name" value="Teclipse Notifications">
+
+                        <div class="input-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" placeholder="Enter your name"
+                                style="text-transform: uppercase;" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="example@domain.com" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Rate your experience</label>
+                            <div class="star-rating" id="star-rating">
+                                <i class='bx bx-star star' data-value="1"></i>
+                                <i class='bx bx-star star' data-value="2"></i>
+                                <i class='bx bx-star star' data-value="3"></i>
+                                <i class='bx bx-star star' data-value="4"></i>
+                                <i class='bx bx-star star' data-value="5"></i>
+                            </div>
+                            <input type="hidden" id="rating-value" name="rating" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="message">Feedback Message</label>
+                            <textarea id="message" name="message" rows="4" placeholder="How was your experience?"
+                                required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">Submit Feedback</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="section-container">
+            <div class="footer-content"
+                style="display: flex; flex-wrap: wrap; gap: 3rem; justify-content: space-between;">
+                <div class="footer-brand" style="flex: 1; min-width: 250px;">
+                    <div class="logo"
+                        style="display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                        <img src="./teclipse2.png"
+                            style="max-height: 48px; max-width: 100%; width: auto; height: auto;" />
+                        <div class="logo-text footer-logo-text"
+                            style="color: #ffffff; font-size: clamp(1.2rem, 4vw, 1.5rem); text-align: center; align-items: center;">
+                            Teclipse
+                            <span>Education Hub</span>
+                        </div>
+                    </div>
+                    <p style="color: #ffffff; text-align: center; margin-top: 1rem;">Empowering the next generation of
+                        tech leaders with affordable, high
+                        quality education.</p>
+                    <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem;">
+                        <a href="https://youtube.com/@esaidigitallearninghub?si=SC6Z0QufUW3XfAdd" target="_blank"
+                            style="color: #fff; font-size: 1.8rem; transition: transform 0.3s;"
+                            onmouseover="this.style.transform='scale(1.1)'; this.style.color='var(--primary-color)'"
+                            onmouseout="this.style.transform='scale(1)'; this.style.color='#fff'" title="YouTube"><i
+                                class='bx bxl-youtube'></i></a>
+                        <a href="https://www.instagram.com/teclipse_e_hub?igsh=dm50eXByamV2NTI3" target="_blank"
+                            style="color: #fff; font-size: 1.8rem; transition: transform 0.3s;"
+                            onmouseover="this.style.transform='scale(1.1)'; this.style.color='var(--primary-color)'"
+                            onmouseout="this.style.transform='scale(1)'; this.style.color='#fff'" title="Instagram"><i
+                                class='bx bxl-instagram'></i></a>
+                        <a href="https://wa.me/919943150099?text=I%20have%20interested%20about%20teclipse%20please%20share%20about!!"
+                            target="_blank" style="color: #fff; font-size: 1.8rem; transition: transform 0.3s;"
+                            onmouseover="this.style.transform='scale(1.1)'; this.style.color='var(--primary-color)'"
+                            onmouseout="this.style.transform='scale(1)'; this.style.color='#fff'" title="WhatsApp"><i
+                                class='bx bxl-whatsapp'></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-founders" style="flex: 1; min-width: 250px;">
+                    <h3 style="color: var(--primary-color); margin-bottom: 1rem; font-size: 1.25rem;">Mentors & Contact
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+                        <p style="color: #ffffff; display: flex; align-items: center; justify-content: flex-start; gap: 8px;"
+                            class="founder-entry">
+                            <strong>Founder:</strong> P. Esai Yazhini
+                            <a href="tel:+919943150099" class="contact-icon-card" title="Call Founder"><i
+                                    class='bx bx-phone-call'></i></a>
+                        </p>
+                        <p style="color: #ffffff; display: flex; align-items: center; justify-content: flex-start; gap: 8px;"
+                            class="founder-entry">
+                            <strong>Co-founder:</strong> A. Mohammed Aslam
+                            <a href="tel:+918248744081" class="contact-icon-card" title="Call Co-founder"><i
+                                    class='bx bx-phone-call'></i></a>
+                        </p>
+                        <p style="color: #ffffff; display: flex; align-items: center; justify-content: flex-start; gap: 8px;"
+                            class="founder-entry">
+                            <strong>Tech Partner:</strong> M. Mohamed Irfan
+                            <a href="tel:+917598659947" class="contact-icon-card" title="Call Tech Partner"><i
+                                    class='bx bx-phone-call'></i></a>
+                        </p>
+                    </div>
+
+                    <div style="font-size: 0.95rem;">
+                        <a href="mailto:teclipseeducationhub@gmail.com" target="_blank" class="mail-card">
+                            <i class='bx bx-envelope' style="font-size: 1.25rem; color: var(--primary-color);"></i>
+                            teclipseeducationhub@gmail.com
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-links"
+                    style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <h3 style="color: var(--primary-color); font-size: 1.25rem; margin-bottom: 0.5rem;">Quick Links</h3>
+                    <a href="#home"><i class='bx bx-chevron-right'></i> Home</a>
+                    <a href="#courses"><i class='bx bx-chevron-right'></i> Courses</a>
+                    <a href="#about"><i class='bx bx-chevron-right'></i> About</a>
+                    <a href="#feedback"><i class='bx bx-chevron-right'></i> Feedback</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom"
+                style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+                <p>&copy; 2026 Teclipse Education Hub. All rights reserved.</p>
+                <p style="margin-top: 8px; font-size: 0.85rem;"><a href="#"
+                        style="color: #ffffff; text-decoration: none; transition: opacity 0.3s; opacity: 0.8;"
+                        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">Designed by Mohamed
+                        Irfan M - Hamza IR solutions.</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Icon -->
+    <a href="https://wa.me/919943150099?text=I%20have%20interested%20about%20teclipse%20please%20share%20about!!"
+        target="_blank" class="whatsapp-float">
+        <i class='bx bxl-whatsapp'></i>
+        <div class="wa-tooltip">Ask here or any doubts?</div>
+        <!-- Pulse ring for attention -->
+        <span class="pulse-ring"></span>
+    </a>
+
+    <!-- Firebase SDK Setup -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC37pyEKLFOtC-nOecaRsz9wCq_blcb-CU",
+            authDomain: "teclipse-education-hub.firebaseapp.com",
+            projectId: "teclipse-education-hub",
+            storageBucket: "teclipse-education-hub.firebasestorage.app",
+            messagingSenderId: "224399410151",
+            appId: "1:224399410151:web:2a85668a8b2bb60e9f3342",
+            measurementId: "G-E4Z5PP7NCZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Make db globally available to script.js
+        window.firebaseDb = db;
+        window.firebaseModules = { collection, addDoc, getDocs, onSnapshot, query, orderBy };
+    </script>
+    <script src="script.js"></script>
+    <script>
+        // Inline script to handle the fallback image/logo functionality flawlessly
+        const logoImg = document.querySelector('.logo-img');
+        const fallbackText = document.getElementById('fallback-logo');
+        if (logoImg) {
+            logoImg.addEventListener('error', function () {
+                this.style.display = 'none';
+                if (fallbackText) fallbackText.style.display = 'flex';
+            });
+            logoImg.addEventListener('load', function () {
+                if (fallbackText) fallbackText.style.display = 'none';
+            });
+        }
+    </script>
+</body>
+
+</html>
