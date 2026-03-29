@@ -17,6 +17,10 @@
             <div class="logo">
                 <img src="logo.png" alt="Teclipse Education Hub" class="logo-img"
                     onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'40\'><text x=\'0\' y=\'25\' font-family=\'Arial\' font-size=\'20\' font-weight=\'bold\' fill=\'%231E3A8A\'>Teclipse</text></svg>'">
+                <div class="logo-text" id="admin-logo-text" style="margin-left:0.5rem;">
+                    Teclipse
+                    <span>Education Hub</span>
+                </div>
             </div>
             <div class="nav-actions">
                 <button id="theme-toggle-admin" class="icon-btn" aria-label="Toggle Theme">
@@ -72,7 +76,12 @@
                 <div class="feedback-table-container" style="max-height: 400px; overflow-y: auto;">
                     <!-- Mobile-friendly cards (hidden on desktop) -->
                     <div id="admin-feedback-cards" class="admin-feedback-cards" style="display:none;"></div>
-                    <table class="feedback-table">
+                        <!-- Loading spinner while feedbacks are fetched -->
+                        <div id="feedback-loading" style="display:block; text-align:center; padding:1.5rem;">
+                            <div class="spinner" aria-hidden="true"></div>
+                            <div style="margin-top:8px; color:var(--text-muted);">Loading feedback...</div>
+                        </div>
+                        <table class="feedback-table">
                         <thead style="position: sticky; top: 0; z-index: 10;">
                             <tr>
                                 <th>Date</th>

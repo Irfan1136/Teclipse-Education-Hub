@@ -244,10 +244,18 @@ function initializeAdminFirebase() {
 
         // Listen for Feedbacks
         const qF = query(collection(window.firebaseDb, "feedbacks"), orderBy("timestamp", "desc"));
+        const loadingEl = document.getElementById('feedback-loading');
         onSnapshot(qF, (snapshot) => {
             const feedbacks = [];
             snapshot.forEach((doc) => feedbacks.push({ id: doc.id, ...doc.data() }));
             renderAdminFeedbacks(feedbacks);
+            if (loadingEl) loadingEl.style.display = 'none';
+        }, (err) => {
+            console.error('Feedback snapshot error:', err);
+            if (loadingEl) {
+                loadingEl.style.display = 'block';
+                loadingEl.querySelector('div:last-child').textContent = 'Error loading feedback.';
+            }
         });
 
         // Listen for Achievements
