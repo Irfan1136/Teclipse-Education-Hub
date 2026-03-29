@@ -929,6 +929,7 @@ section {
     margin-bottom: 1.5rem;
     line-height: 1.7;
     color: var(--text-main);
+    text-align: center;
 }
 
 .reviewer-name {
