@@ -609,17 +609,17 @@
     </script>
     <script src="script.js"></script>
     <script>
-        // Inline script to handle the fallback image/logo functionality flawlessly
+        // Inline script to handle the fallback image/logo functionality
+        // Keep the textual logo visible alongside the image for accessibility and branding
         const logoImg = document.querySelector('.logo-img');
         const fallbackText = document.getElementById('fallback-logo');
+        if (fallbackText) fallbackText.style.display = 'flex';
         if (logoImg) {
             logoImg.addEventListener('error', function () {
                 this.style.display = 'none';
                 if (fallbackText) fallbackText.style.display = 'flex';
             });
-            logoImg.addEventListener('load', function () {
-                if (fallbackText) fallbackText.style.display = 'none';
-            });
+            // Do not hide the textual logo when the image loads — keep both visible
         }
     </script>
 </body>

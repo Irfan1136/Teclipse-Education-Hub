@@ -85,6 +85,20 @@ html, body { overflow-x: hidden; }
     box-sizing: border-box;
 }
 
+/* Always show subtitle next to logo in navbar */
+.navbar .logo-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.navbar .logo-text span {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    margin-top: 2px;
+}
+
 /* Mobile: center logo text and ensure it doesn't overflow */
 @media (max-width: 480px) {
     .nav-container {
@@ -1792,4 +1806,31 @@ input[type="file"]::file-selector-button:hover {
     @media (max-width: 380px) {
         .whatsapp-float { bottom: 110px; right: 12px; }
     }
+}
+
+/* Admin page: make feedback table responsive on small screens and center file-upload */
+@media (max-width: 768px) {
+    .feedback-table {
+        min-width: 0;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .feedback-table th,
+    .feedback-table td {
+        word-break: break-word;
+        white-space: normal;
+    }
+
+    .file-upload-block {
+        margin: 0 auto;
+        max-width: 520px;
+        display: block;
+    }
+}
+
+/* Center file upload on large screens too */
+.file-upload-block {
+    margin: 0 auto;
+    max-width: 700px;
 }
