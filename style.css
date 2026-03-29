@@ -1647,3 +1647,61 @@ input[type="file"]::file-selector-button:hover {
         height: 36px;
     }
 }
+
+/* Extra small screens: stack feedback and reduce padding to avoid overlap */
+@media (max-width: 480px) {
+    .feedback-wrapper {
+        flex-direction: column;
+        gap: 1.25rem;
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+
+    .feedback-info {
+        min-width: 0;
+        order: 1;
+        padding-bottom: 0.5rem;
+    }
+
+    .feedback-info h2 {
+        font-size: 1.5rem;
+    }
+
+    .feedback-form-container {
+        min-width: 0;
+        order: 2;
+        width: 100%;
+    }
+
+    .input-group label {
+        font-size: 0.9rem;
+    }
+
+    input,
+    textarea {
+        font-size: 0.95rem;
+        padding: 0.75rem 0.9rem;
+    }
+
+    .btn {
+        font-size: 0.95rem;
+        padding: 0.7rem 1rem;
+    }
+
+    /* Move WhatsApp float slightly up and smaller to avoid covering inputs */
+    .whatsapp-float {
+        width: 54px;
+        height: 54px;
+        bottom: 80px;
+        right: 16px;
+        font-size: 32px;
+    }
+
+    .wa-tooltip {
+        display: none;
+    }
+
+    .pulse-ring {
+        display: none;
+    }
+}
