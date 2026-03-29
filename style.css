@@ -76,6 +76,42 @@ html {
 /* Prevent horizontal scroll caused by offscreen transforms or wide elements */
 html, body { overflow-x: hidden; }
 
+/* Ensure nav container sizing and prevent content shift */
+.nav-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Mobile: center logo text and ensure it doesn't overflow */
+@media (max-width: 480px) {
+    .nav-container {
+        padding: 0.6rem 1rem;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .logo-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .logo-text span {
+        font-size: 0.65rem;
+        color: var(--primary-color);
+    }
+}
+
 body {
     background-color: var(--bg-color);
     color: var(--text-main);
@@ -339,7 +375,7 @@ section {
     height: 100vh;
     background-color: var(--bg-color);
     z-index: 2001;
-    transform: translateX(-110%);
+    transform: translateX(-120%);
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 5px 0 25px rgba(0, 0, 0, 0.15);
     padding: 2rem;
