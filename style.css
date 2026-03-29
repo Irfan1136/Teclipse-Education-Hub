@@ -218,10 +218,17 @@ section {
     transition: all var(--transition-smooth);
 }
 
+/* Keep navbar height stable to avoid layout jumps when scrolled */
 .navbar.scrolled {
     box-shadow: var(--shadow-md);
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
+}
+
+/* Ensure nav-container controls spacing so changes to .navbar don't shift content */
+.nav-container {
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .nav-container {

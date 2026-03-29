@@ -52,9 +52,20 @@ const overlay = document.getElementById('sidebar-overlay');
 const closeSidebar = document.getElementById('close-sidebar');
 
 if (navbar) {
+    // Debounced scroll handler to avoid jitter and repeated toggles
+    let lastScroll = window.scrollY;
+    let scrollTimeout = null;
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 20) navbar.classList.add('scrolled');
-        else navbar.classList.remove('scrolled');
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const y = window.scrollY;
+            if (y > 20 && !navbar.classList.contains('scrolled')) {
+                navbar.classList.add('scrolled');
+            } else if (y <= 20 && navbar.classList.contains('scrolled')) {
+                navbar.classList.remove('scrolled');
+            }
+            lastScroll = y;
+        }, 60);
     });
 }
 
