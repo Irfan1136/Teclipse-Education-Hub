@@ -1373,11 +1373,20 @@ textarea:focus {
 .admin-main-page .section-container { padding-left: 2rem; padding-right: 2.5rem; }
 .admin-header-actions { flex-shrink: 0; }
 
-/* Keep admin brand on a single line and avoid wrapping */
+/* Admin brand: two-line layout (Teclipse / Education Hub) */
 .admin-body .logo-text {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1;
+    overflow: visible;
+}
+.admin-body .logo-text span {
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 /* Header actions responsiveness: prevent clipping and allow wrapping on tight screens */
