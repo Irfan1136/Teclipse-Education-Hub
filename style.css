@@ -299,6 +299,11 @@ section {
 /* Ensure content doesn't sit under the fixed navbar */
 body { padding-top: var(--navbar-height); }
 
+/* Reduce extra top space for admin pages so header sits closer to navbar */
+.admin-body {
+    padding-top: calc(var(--navbar-height) - 8px);
+}
+
 .logo {
     display: flex;
     align-items: center;
@@ -1363,6 +1368,11 @@ textarea:focus {
 #upload-achievement-form { margin: 0 auto; }
 .file-upload-block { margin: 0 auto; }
 
+/* Admin-specific header spacing and logo sizing */
+.admin-body .logo-img.admin-logo-img { height: 36px; width: auto; }
+.admin-main-page .section-container { padding-left: 2rem; padding-right: 2.5rem; }
+.admin-header-actions { flex-shrink: 0; }
+
 .feedback-table {
     width: 100%;
     border-collapse: separate;
@@ -1435,9 +1445,9 @@ textarea:focus {
         display: none;
     }
 
-/* Admin header responsive controls */
+/* Admin header responsive controls: keep both buttons visible on small screens */
 @media (max-width: 700px) {
-    .back-to-website { display: none !important; }
+    .back-to-website { display: inline-flex !important; }
     #change-pass-btn { display: inline-flex !important; }
 }
 

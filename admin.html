@@ -12,14 +12,12 @@
 </head>
 
 <body class="admin-body">
-    <nav class="navbar" style="position: sticky;">
+    <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <img src="logo.png" alt="Teclipse Education Hub" class="logo-img"
-                    onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'40\'><text x=\'0\' y=\'25\' font-family=\'Arial\' font-size=\'20\' font-weight=\'bold\' fill=\'%231E3A8A\'>Teclipse</text></svg>'">
+                <img src="teclipse2.png" alt="Teclipse" class="logo-img admin-logo-img" onerror="this.style.display='none'" />
                 <div class="logo-text" id="admin-logo-text" style="margin-left:0.5rem;">
-                    Teclipse
-                    <span>Education Hub</span>
+                    Teclipse Education Hub
                 </div>
             </div>
             <div class="nav-actions">
@@ -33,11 +31,11 @@
 
     <main class="admin-main-page">
         <div class="section-container">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap:1rem;">
                 <div>
                     <h2>Admin Dashboard</h2>
                 </div>
-                <div style="display:flex; gap:0.5rem; align-items:center;">
+                <div class="admin-header-actions" style="display:flex; gap:0.5rem; align-items:center;">
                     <button id="change-pass-btn" class="btn btn-outline" style="font-size:0.9rem;">Change Password</button>
                     <a href="index.html" class="btn btn-primary back-to-website" style="font-size: 0.9rem;">Back to Website</a>
                 </div>
