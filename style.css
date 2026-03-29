@@ -1527,3 +1527,123 @@ input[type="file"]::file-selector-button {
 input[type="file"]::file-selector-button:hover {
     background-color: var(--accent-color) !important;
 }
+
+/* Responsive fixes for small screens: prevent overlap, remove forced min-widths, and avoid zooming */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+
+    .mobile-menu-btn {
+        display: block;
+    }
+
+    .logo-img {
+        height: 40px;
+    }
+
+    .logo-text {
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    .logo-text span {
+        font-size: 0.65rem;
+        margin-top: 2px;
+        display: block;
+    }
+
+    .nav-container {
+        padding: 0.6rem 1rem;
+    }
+
+    .section-container {
+        padding: 0 1rem;
+    }
+
+    /* Make hero stack on small screens */
+    .hero {
+        flex-direction: column;
+        padding-top: 5rem;
+    }
+
+    .hero-content {
+        padding-right: 0;
+    }
+
+    .abstract-tech {
+        width: 260px;
+        height: 260px;
+    }
+
+    /* Admin feedback table responsiveness: allow horizontal scroll and wrap cells */
+    .feedback-table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .feedback-table {
+        width: 100% !important;
+        min-width: 0 !important;
+        table-layout: fixed;
+    }
+
+    .feedback-table th,
+    .feedback-table td {
+        white-space: normal;
+        word-wrap: break-word;
+        max-width: 180px;
+        padding: 0.5rem 0.75rem;
+        vertical-align: top;
+    }
+
+    .feedback-table th:last-child,
+    .feedback-table td:last-child {
+        text-align: right;
+    }
+
+    /* File upload and form controls should be full width to avoid overlap */
+    .file-upload-block {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 1.25rem;
+    }
+
+    .form .input-group label {
+        display: block;
+        margin-bottom: 0.35rem;
+        font-size: 0.95rem;
+    }
+
+    .form input,
+    .form textarea,
+    .form select {
+        width: 100%;
+    }
+
+    /* Prevent images and tables from forcing zoom/overflow */
+    img,
+    table {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Make mobile sidebar occupy more of the screen */
+    .mobile-sidebar {
+        width: 85%;
+    }
+}
+
+@media (max-width: 420px) {
+    .logo-text span {
+        display: none;
+    }
+
+    .logo-text {
+        font-size: 0.95rem;
+    }
+
+    .logo-img {
+        height: 36px;
+    }
+}
