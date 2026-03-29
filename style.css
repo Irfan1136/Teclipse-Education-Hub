@@ -1310,6 +1310,39 @@ textarea:focus {
     overflow-x: auto;
 }
 
+/* Mobile card view for admin feedback */
+.admin-feedback-cards {
+    display: none;
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+}
+
+.admin-feedback-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-feedback-card .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.admin-feedback-card .card-name { font-weight: 700; color: var(--primary-color); }
+.admin-feedback-card .card-date { color: var(--text-muted); font-size: 0.9rem; }
+.admin-feedback-card .card-body { color: var(--text-main); margin-bottom: 0.5rem; }
+.admin-feedback-card .card-email a { color: var(--primary-color); }
+.admin-feedback-card .card-message { margin-top: 0.5rem; }
+
+/* Center file upload block in admin page */
+#upload-achievement-form { margin: 0 auto; }
+.file-upload-block { margin: 0 auto; }
+
 .feedback-table {
     width: 100%;
     border-collapse: separate;

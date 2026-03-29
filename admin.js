@@ -43,14 +43,19 @@ function generateAdminStars(rating) {
 }
 
 function renderAdminFeedbacks(feedbacks) {
+    // Render both table rows and mobile cards (cards shown on narrow viewports)
     feedbackList.innerHTML = '';
+    const cardsContainer = document.getElementById('admin-feedback-cards');
+    if (cardsContainer) cardsContainer.innerHTML = '';
 
     if (feedbacks.length === 0) {
         feedbackList.innerHTML = '<tr><td colspan="6" class="empty-state">No student feedback found.</td></tr>';
+        if (cardsContainer) cardsContainer.innerHTML = '<div class="empty-state">No student feedback found.</div>';
         return;
     }
 
     feedbacks.forEach((fb) => {
+        // Table row (desktop)
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td style="white-space: nowrap; color: var(--text-muted);">${fb.date}</td>
@@ -65,7 +70,39 @@ function renderAdminFeedbacks(feedbacks) {
             </td>
         `;
         feedbackList.appendChild(tr);
+
+        // Mobile card (narrow screens)
+        if (cardsContainer) {
+            const card = document.createElement('div');
+            card.className = 'admin-feedback-card';
+            card.innerHTML = `
+                <div class="card-head">
+                    <div class="card-name">${fb.name}</div>
+                    <div class="card-date">${fb.date}</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-email"><a href="mailto:${fb.email}">${fb.email}</a></div>
+                    <div class="card-rating">${generateAdminStars(fb.rating)}</div>
+                    <div class="card-message">${fb.message}</div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-danger" onclick="deleteFeedback('${fb.id}')" aria-label="Delete"><i class='bx bx-trash'></i></button>
+                </div>
+            `;
+            cardsContainer.appendChild(card);
+        }
     });
+
+    // Show/hide table vs cards based on viewport width initially
+    function toggleFeedbackView() {
+        const showCards = window.innerWidth <= 700;
+        if (cardsContainer) cardsContainer.style.display = showCards ? 'block' : 'none';
+        const tableEl = document.querySelector('.feedback-table');
+        if (tableEl) tableEl.style.display = showCards ? 'none' : 'table';
+    }
+
+    toggleFeedbackView();
+    window.addEventListener('resize', toggleFeedbackView);
 }
 
 window.deleteFeedback = async function (id) {
