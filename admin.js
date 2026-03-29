@@ -243,7 +243,8 @@ function initializeAdminFirebase() {
         const { collection, onSnapshot, query, orderBy } = window.firebaseModules;
 
         // Listen for Feedbacks
-        const qF = query(collection(window.firebaseDb, "feedbacks"), orderBy("timestamp", "desc"));
+        // Limit initial fetch to most recent 50 feedbacks to reduce load time on admin dashboard
+        const qF = query(collection(window.firebaseDb, "feedbacks"), orderBy("timestamp", "desc"), window.firebaseModules.limit(50));
         const loadingEl = document.getElementById('feedback-loading');
         onSnapshot(qF, (snapshot) => {
             const feedbacks = [];

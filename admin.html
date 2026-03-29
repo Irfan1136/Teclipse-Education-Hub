@@ -36,13 +36,10 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
                 <div>
                     <h2>Admin Dashboard</h2>
-                    <p>Welcome, <span style="font-weight: 500; color: var(--primary-color);">Teclipse Education
-                            Hub</span>
-                    </p>
                 </div>
                 <div style="display:flex; gap:0.5rem; align-items:center;">
                     <button id="change-pass-btn" class="btn btn-outline" style="font-size:0.9rem;">Change Password</button>
-                    <a href="index.html" class="btn btn-primary" style="font-size: 0.9rem;">Back to Website</a>
+                    <a href="index.html" class="btn btn-primary back-to-website" style="font-size: 0.9rem;">Back to Website</a>
                 </div>
             </div>
 
@@ -149,7 +146,7 @@
     <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC37pyEKLFOtC-nOecaRsz9wCq_blcb-CU",
@@ -166,7 +163,7 @@
 
         // Make db globally available to admin.js
         window.firebaseDb = db;
-        window.firebaseModules = { collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy };
+        window.firebaseModules = { collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy, limit };
     </script>
     <script src="admin.js"></script>
     <script>

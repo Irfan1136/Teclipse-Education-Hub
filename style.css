@@ -1435,6 +1435,22 @@ textarea:focus {
         display: none;
     }
 
+/* Admin header responsive controls */
+@media (max-width: 700px) {
+    .back-to-website { display: none !important; }
+    #change-pass-btn { display: inline-flex !important; }
+}
+
+/* make admin cards more spacious on small screens */
+@media (max-width: 480px) {
+    .admin-feedback-card {
+        padding: 1rem;
+        border-radius: 14px;
+        font-size: 0.98rem;
+    }
+    .admin-feedback-card .card-message { margin-top: 0.75rem; }
+}
+
     .mobile-menu-btn {
         display: flex;
     }
