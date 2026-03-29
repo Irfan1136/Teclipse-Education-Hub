@@ -263,3 +263,49 @@ function initializeAdminFirebase() {
 }
 
 initializeAdminFirebase();
+
+// Change password UI behavior
+const changePassBtn = document.getElementById('change-pass-btn');
+const changePassModal = document.getElementById('change-pass-modal');
+const closeChangePass = document.getElementById('close-change-pass');
+const changePassForm = document.getElementById('change-pass-form');
+
+if (changePassBtn && changePassModal) {
+    changePassBtn.addEventListener('click', () => changePassModal.classList.add('show'));
+}
+if (closeChangePass && changePassModal) {
+    closeChangePass.addEventListener('click', () => changePassModal.classList.remove('show'));
+}
+window.addEventListener('click', (e) => {
+    if (e.target === changePassModal) changePassModal.classList.remove('show');
+});
+
+if (changePassForm) {
+    changePassForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const oldPass = document.getElementById('old-pass').value;
+        const newPass = document.getElementById('new-pass').value;
+        const confirmPass = document.getElementById('confirm-pass').value;
+
+        const stored = localStorage.getItem('teclipse_admin_password') || '2003@esai';
+        if (oldPass !== stored) return alert('Current password is incorrect.');
+        if (newPass !== confirmPass) return alert('New passwords do not match.');
+
+        // Validate: min 8 chars, letters, numbers, special char
+        const valid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(newPass);
+        if (!valid) return alert('Password must be at least 8 chars and include letters, numbers and a special character.');
+
+        // Save new password
+        localStorage.setItem('teclipse_admin_password', newPass);
+
+        // Try to send a confirmation email via mailto (opens user's mail client)
+        const subject = encodeURIComponent('Teclipse Admin Password Changed');
+        const body = encodeURIComponent(`The admin password was changed successfully on ${new Date().toLocaleString()}. If this was not you, please investigate.`);
+        // Open mail client (best-effort notification)
+        window.open(`mailto:teclipseeducationhub@gmail.com?subject=${subject}&body=${body}`);
+
+        alert('Password updated successfully. A confirmation mail has been prepared to send.');
+        changePassModal.classList.remove('show');
+        changePassForm.reset();
+    });
+}

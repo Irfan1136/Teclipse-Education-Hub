@@ -36,12 +36,38 @@
                             Hub</span>
                     </p>
                 </div>
-                <a href="index.html" class="btn btn-primary" style="font-size: 0.9rem;">Back to Website</a>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <button id="change-pass-btn" class="btn btn-outline" style="font-size:0.9rem;">Change Password</button>
+                    <a href="index.html" class="btn btn-primary" style="font-size: 0.9rem;">Back to Website</a>
+                </div>
             </div>
 
             <div class="admin-panel mt-4">
                 <div class="panel-header">
                     <h3>Student Feedback & Reviews Management</h3>
+                </div>
+                <!-- Change Password Modal -->
+                <div id="change-pass-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-modal" id="close-change-pass">&times;</span>
+                        <h3>Change Admin Password</h3>
+                        <form id="change-pass-form" class="form">
+                            <div class="input-group">
+                                <label for="old-pass">Current Password</label>
+                                <input type="password" id="old-pass" required />
+                            </div>
+                            <div class="input-group">
+                                <label for="new-pass">New Password</label>
+                                <input type="password" id="new-pass" required />
+                                <small>Password must be at least 8 characters and include letters, numbers and a special character.</small>
+                            </div>
+                            <div class="input-group">
+                                <label for="confirm-pass">Confirm New Password</label>
+                                <input type="password" id="confirm-pass" required />
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Password</button>
+                        </form>
+                    </div>
                 </div>
                 <div class="feedback-table-container" style="max-height: 400px; overflow-y: auto;">
                     <!-- Mobile-friendly cards (hidden on desktop) -->

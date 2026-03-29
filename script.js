@@ -145,8 +145,9 @@ if (adminForm) {
         const email = document.getElementById('admin-email').value;
         const pass = document.getElementById('admin-pass').value;
 
-        // Exact authentication details requested
-        if (email === 'teclipseeducationhub@gmail.com' && pass === '2003@esai') {
+        // Use stored admin password in localStorage with a default fallback
+        const storedPass = localStorage.getItem('teclipse_admin_password') || '2003@esai';
+        if (email === 'teclipseeducationhub@gmail.com' && pass === storedPass) {
             localStorage.setItem('teclipse_admin_auth', 'true');
             window.location.href = 'admin.html';
         } else {
