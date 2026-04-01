@@ -1,8 +1,4 @@
 {
-  name teclipse-backend,
-  version 1.0.0,
-  type module,
-  dependencies {
-    nodemailer ^6.9.4
-  }
+  "name": "api",
+  "version": "1.0.0"
 }
