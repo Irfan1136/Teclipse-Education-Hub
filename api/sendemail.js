@@ -13,23 +13,34 @@ export default async function handler(req, res) {
         "api-key": process.env.BREVO_API_KEY,
       },
       body: JSON.stringify({
-        sender: { name: "Teclipse", email: "teclipseeducationhub@gmail.com" },
+        sender: {
+          name: "Teclipse",
+          email: "teclipseeducationhub@gmail.com" // MUST be verified in Brevo
+        },
         to: [{ email: "irsparks011@gmail.com" }],
         subject: "New Feedback Received",
         htmlContent: `
           <h2>New Feedback</h2>
           <p><b>Name:</b> ${name}</p>
           <p><b>Email:</b> ${email}</p>
-          <p><b>Rating:</b> ${rating} ⭐</p>
+          <p><b>Rating:</b> ${rating}</p>
           <p><b>Message:</b> ${message}</p>
         `,
       }),
     });
 
     const data = await response.json();
-    res.status(200).json(data);
+
+    console.log("BREVO RESPONSE:", data); // 🔥 IMPORTANT DEBUG
+
+    if (!response.ok) {
+      return res.status(500).json({ error: data });
+    }
+
+    return res.status(200).json({ success: true });
 
   } catch (err) {
-    res.status(500).json({ error: "Mail failed" });
+    console.error("MAIL ERROR:", err);
+    return res.status(500).json({ error: "Mail failed" });
   }
 }
