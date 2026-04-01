@@ -6,7 +6,7 @@ console.log("JS LOADED ✅");
 const htmlEl = document.documentElement;
 
 function updateIcon(isDark) {
-    document.querySelectorAll('#theme-icon, #theme-icon-admin').forEach(icon => {
+    document.querySelectorAll('#theme-icon').forEach(icon => {
         icon.classList.toggle('bx-sun', isDark);
         icon.classList.toggle('bx-moon', !isDark);
     });
@@ -19,30 +19,39 @@ function initTheme() {
     updateIcon(isDark);
 }
 
-document.querySelectorAll('#theme-toggle, #theme-toggle-admin').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const newTheme = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        htmlEl.setAttribute('data-theme', newTheme);
-        localStorage.setItem('teclipse-theme', newTheme);
-        updateIcon(newTheme === 'dark');
-    });
+document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    const newTheme = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    htmlEl.setAttribute('data-theme', newTheme);
+    localStorage.setItem('teclipse-theme', newTheme);
+    updateIcon(newTheme === 'dark');
 });
 
 initTheme();
 
-/* ================= NAVBAR ================= */
-const navbar = document.querySelector('.navbar');
-window.addEventListener('scroll', () => {
-    if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 20);
-});
+/* ================= MOBILE SIDEBAR ================= */
+const menuBtn = document.getElementById("mobile-menu-btn");
+const sidebar = document.getElementById("mobile-sidebar");
+const overlay = document.getElementById("sidebar-overlay");
+const closeSidebar = document.getElementById("close-sidebar");
 
-/* ================= MOBILE MENU ================= */
-const menuBtn = document.getElementById("menu-btn");
-const navLinks = document.getElementById("nav-links");
-
-if (menuBtn && navLinks) {
+if (menuBtn && sidebar && overlay) {
     menuBtn.addEventListener("click", () => {
-        navLinks.classList.toggle("active");
+        sidebar.classList.add("active");
+        overlay.classList.add("active");
+    });
+}
+
+if (closeSidebar) {
+    closeSidebar.addEventListener("click", () => {
+        sidebar.classList.remove("active");
+        overlay.classList.remove("active");
+    });
+}
+
+if (overlay) {
+    overlay.addEventListener("click", () => {
+        sidebar.classList.remove("active");
+        overlay.classList.remove("active");
     });
 }
 
@@ -52,19 +61,14 @@ const mobileLoginBtn = document.getElementById("mobile-login-btn");
 const modal = document.getElementById("login-modal");
 const closeModal = document.getElementById("close-modal");
 
-if (loginBtn && modal) {
-    loginBtn.addEventListener("click", () => {
-        modal.style.display = "flex";
-    });
+function openModal() {
+    if (modal) modal.style.display = "flex";
 }
 
-if (mobileLoginBtn && modal) {
-    mobileLoginBtn.addEventListener("click", () => {
-        modal.style.display = "flex";
-    });
-}
+if (loginBtn) loginBtn.addEventListener("click", openModal);
+if (mobileLoginBtn) mobileLoginBtn.addEventListener("click", openModal);
 
-if (closeModal && modal) {
+if (closeModal) {
     closeModal.addEventListener("click", () => {
         modal.style.display = "none";
     });
@@ -91,8 +95,6 @@ if (adminForm) {
                 body: JSON.stringify({ email, password })
             });
 
-            if (!res.ok) throw new Error("API error");
-
             const data = await res.json();
 
             if (data.success) {
@@ -103,7 +105,6 @@ if (adminForm) {
             }
 
         } catch (err) {
-            console.error(err);
             alert("Server error");
         }
     });
@@ -131,27 +132,17 @@ if (feedbackForm) {
     feedbackForm.addEventListener('submit', async e => {
         e.preventDefault();
 
-        if (!ratingInput.value) {
-            alert("Select rating");
-            return;
-        }
-
         const name = document.getElementById('name').value;
         const email = document.getElementById('email').value;
         const message = document.getElementById('message').value;
-        const rating = parseInt(ratingInput.value);
+        const rating = ratingInput.value;
 
         try {
             // Firebase save
             if (window.firebaseDb && window.firebaseModules) {
                 const { collection, addDoc } = window.firebaseModules;
-
                 await addDoc(collection(window.firebaseDb, "feedbacks"), {
-                    name,
-                    email,
-                    message,
-                    rating,
-                    timestamp: Date.now()
+                    name, email, message, rating, timestamp: Date.now()
                 });
             }
 
@@ -162,39 +153,28 @@ if (feedbackForm) {
                 body: JSON.stringify({ name, email, message, rating })
             });
 
-            if (!res.ok) throw new Error("Email failed");
+            if (!res.ok) throw new Error();
 
-            alert("Feedback sent!");
+            alert("Feedback sent ✅");
             feedbackForm.reset();
-            ratingInput.value = '';
 
-        } catch (err) {
-            console.error(err);
-            alert("Error submitting feedback");
+        } catch {
+            alert("Mail not sending ❌ (Check Vercel ENV)");
         }
     });
 }
 
 /* ================= TESTIMONIALS ================= */
 let currentSlide = 0;
-let sliderInterval;
 
 function showSlide(index) {
     const slides = document.querySelectorAll('.testimonial-slide');
-    if (slides.length === 0) return;
+    if (!slides.length) return;
 
-    slides.forEach(slide => slide.classList.remove('active'));
+    slides.forEach(s => s.classList.remove('active'));
 
     currentSlide = (index + slides.length) % slides.length;
     slides[currentSlide].classList.add('active');
-}
-
-function startSlider() {
-    if (sliderInterval) clearInterval(sliderInterval);
-
-    sliderInterval = setInterval(() => {
-        showSlide(currentSlide + 1);
-    }, 3000);
 }
 
 function loadTestimonials() {
@@ -207,33 +187,27 @@ function loadTestimonials() {
 
     onSnapshot(q, (snapshot) => {
         slider.innerHTML = "";
-        currentSlide = 0;
 
-        snapshot.forEach((doc, index) => {
-            const data = doc.data();
+        snapshot.forEach((doc, i) => {
+            const d = doc.data();
 
             const div = document.createElement('div');
             div.className = 'testimonial-slide';
-            if (index === 0) div.classList.add('active');
+            if (i === 0) div.classList.add('active');
 
             div.innerHTML = `
-                <p style="color: var(--text-color);">"${data.message}"</p>
-                <h4 style="color: var(--text-color);">- ${data.name}</h4>
+                <p class="testimonial-text">"${d.message}"</p>
+                <h4 class="testimonial-name">- ${d.name}</h4>
             `;
 
             slider.appendChild(div);
         });
-
-        startSlider();
     });
 }
 
-/* BUTTON CONTROLS */
-const nextBtn = document.getElementById("next-btn");
-const prevBtn = document.getElementById("prev-btn");
-
-if (nextBtn) nextBtn.addEventListener("click", () => showSlide(currentSlide + 1));
-if (prevBtn) prevBtn.addEventListener("click", () => showSlide(currentSlide - 1));
+/* BUTTONS */
+document.getElementById("next-btn")?.addEventListener("click", () => showSlide(currentSlide + 1));
+document.getElementById("prev-btn")?.addEventListener("click", () => showSlide(currentSlide - 1));
 
 /* ================= ACHIEVEMENTS ================= */
 function loadAchievements() {
@@ -247,18 +221,13 @@ function loadAchievements() {
 
         snapshot.forEach(doc => {
             const data = doc.data();
-            const imgUrl = data.image || data.imageUrl;
-
-            if (!imgUrl) return;
 
             const card = document.createElement('div');
             card.className = "achievement-card";
 
             card.innerHTML = `
-                <img src="${imgUrl}" 
-                onerror="this.src='fallback.png'"
-                style="width:100%; border-radius:10px;">
-                <p>${data.title || ''}</p>
+                <img src="${data.imageUrl}" style="width:100%">
+                <p>${data.title}</p>
             `;
 
             gallery.appendChild(card);
@@ -266,19 +235,13 @@ function loadAchievements() {
     });
 }
 
-/* ================= WAIT FOR FIREBASE ================= */
-function waitForFirebase(callback) {
-    const interval = setInterval(() => {
-        if (window.firebaseDb && window.firebaseModules) {
-            clearInterval(interval);
-            callback();
-        }
-    }, 100);
-}
-
-waitForFirebase(() => {
-    loadTestimonials();
-    loadAchievements();
-});
+/* WAIT FIREBASE */
+const wait = setInterval(() => {
+    if (window.firebaseDb) {
+        clearInterval(wait);
+        loadTestimonials();
+        loadAchievements();
+    }
+}, 100);
 
 });
