@@ -1,4 +1,4 @@
-// Theme sync
+// ======================= Theme & Logout =======================
 const themeToggleAdmin = document.getElementById('theme-toggle-admin');
 const themeIconAdmin = document.getElementById('theme-icon-admin');
 const htmlElAdmin = document.documentElement;
@@ -26,13 +26,15 @@ themeToggleAdmin.addEventListener('click', () => {
 });
 
 // Logout
-document.getElementById('logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('teclipse_admin_auth');
+document.getElementById('logout-btn')?.addEventListener('click', () => {
+    localStorage.removeItem('teclipse_admin_auth'); // only auth token
     window.location.href = 'index.html';
 });
 
-// Admin Reviews Management (Firebase)
+// ======================= Firebase Feedback & Achievements =======================
 const feedbackList = document.getElementById('admin-feedback-list');
+const cardsContainer = document.getElementById('admin-feedback-cards');
+const adminAchievementsList = document.getElementById('admin-achievements-list');
 
 function generateAdminStars(rating) {
     let html = '';
@@ -42,10 +44,9 @@ function generateAdminStars(rating) {
     return html;
 }
 
+// Render feedbacks
 function renderAdminFeedbacks(feedbacks) {
-    // Render both table rows and mobile cards (cards shown on narrow viewports)
     feedbackList.innerHTML = '';
-    const cardsContainer = document.getElementById('admin-feedback-cards');
     if (cardsContainer) cardsContainer.innerHTML = '';
 
     if (feedbacks.length === 0) {
@@ -54,8 +55,8 @@ function renderAdminFeedbacks(feedbacks) {
         return;
     }
 
-    feedbacks.forEach((fb) => {
-        // Table row (desktop)
+    feedbacks.forEach(fb => {
+        // Table row
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td style="white-space: nowrap; color: var(--text-muted);">${fb.date}</td>
@@ -71,7 +72,7 @@ function renderAdminFeedbacks(feedbacks) {
         `;
         feedbackList.appendChild(tr);
 
-        // Mobile card (narrow screens)
+        // Mobile card
         if (cardsContainer) {
             const card = document.createElement('div');
             card.className = 'admin-feedback-card';
@@ -93,36 +94,26 @@ function renderAdminFeedbacks(feedbacks) {
         }
     });
 
-    // Show/hide table vs cards based on viewport width initially
+    // Toggle table vs cards
     function toggleFeedbackView() {
         const showCards = window.innerWidth <= 700;
         if (cardsContainer) cardsContainer.style.display = showCards ? 'block' : 'none';
         const tableEl = document.querySelector('.feedback-table');
         if (tableEl) tableEl.style.display = showCards ? 'none' : 'table';
     }
-
     toggleFeedbackView();
     window.addEventListener('resize', toggleFeedbackView);
 }
 
 window.deleteFeedback = async function (id) {
-    if (confirm("Are you sure you want to delete this feedback review?")) {
-        if (!window.firebaseDb) return;
-        const { doc, deleteDoc } = window.firebaseModules;
-        try {
-            await deleteDoc(doc(window.firebaseDb, "feedbacks", id));
-            // UI updates automatically via onSnapshot listener
-        } catch (error) {
-            console.error("Error deleting feedback: ", error);
-            alert("Error deleting feedback.");
-        }
-    }
+    if (!window.firebaseDb) return;
+    if (!confirm('Are you sure you want to delete this feedback?')) return;
+    const { doc, deleteDoc } = window.firebaseModules;
+    try { await deleteDoc(doc(window.firebaseDb, 'feedbacks', id)); }
+    catch (err) { console.error(err); alert('Error deleting feedback'); }
 }
 
-// --- Achievements Upload Management (Firebase) ---
-const achievementForm = document.getElementById('upload-achievement-form');
-const adminAchievementsList = document.getElementById('admin-achievements-list');
-
+// Render Achievements
 function renderAdminAchievements(achievements) {
     if (achievements.length === 0) {
         adminAchievementsList.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">No achievements uploaded yet.</p>';
@@ -132,189 +123,81 @@ function renderAdminAchievements(achievements) {
     let html = '';
     achievements.forEach(ach => {
         html += `
-            <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; position: relative; background: var(--bg-secondary);">
-                <img src="${ach.url}" alt="${ach.title}" style="width: 100%; height: 150px; object-fit: contain; background: #000; display: block;" onerror="this.style.display='none'; this.nextElementSibling.insertAdjacentHTML('afterbegin', '<div style=\\'height:150px;display:flex;align-items:center;justify-content:center;background:#eee;color:#999;\\'>Image Error</div>');">
-                <div style="padding: 0.75rem;">
-                    <p style="font-size: 0.9rem; font-weight: 500; margin-bottom: 0.5rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">${ach.title}</p>
-                    <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; width: 100%;" onclick="deleteAchievement('${ach.id}')">Delete</button>
+            <div style="border:1px solid var(--border-color); border-radius:var(--radius-md); overflow:hidden; background:var(--bg-secondary);">
+                <img src="${ach.url}" alt="${ach.title}" style="width:100%; height:150px; object-fit:contain; background:#000;" onerror="this.style.display='none'; this.nextElementSibling.insertAdjacentHTML('afterbegin', '<div style=\\'height:150px;display:flex;align-items:center;justify-content:center;background:#eee;color:#999;\\'>Image Error</div>');">
+                <div style="padding:0.75rem;">
+                    <p style="font-size:0.9rem; font-weight:500; margin-bottom:0.5rem; text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">${ach.title}</p>
+                    <button class="btn btn-outline" style="padding:0.25rem 0.5rem; font-size:0.8rem; width:100%;" onclick="deleteAchievement('${ach.id}')">Delete</button>
                 </div>
             </div>
         `;
     });
-
     adminAchievementsList.innerHTML = html;
 }
 
-if (achievementForm) {
-    achievementForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const title = document.getElementById('achievement-desc').value.trim();
-        const fileInput = document.getElementById('achievement-file');
-        const file = fileInput.files ? fileInput.files[0] : null;
-
-        if (title && file) {
-            const submitBtn = achievementForm.querySelector('button[type="submit"]');
-            submitBtn.innerText = "Processing Image...";
-            submitBtn.disabled = true;
-
-            const reader = new FileReader();
-            reader.onload = function (evt) {
-                const img = new Image();
-                img.onload = async function () {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    const max_size = 1000;
-
-                    if (width > height) {
-                        if (width > max_size) {
-                            height *= max_size / width;
-                            width = max_size;
-                        }
-                    } else {
-                        if (height > max_size) {
-                            width *= max_size / height;
-                            height = max_size;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Compress to JPEG to ensure small size suitable for Firestore
-                    const resizedBaseUrl = canvas.toDataURL('image/jpeg', 0.8);
-
-                    if (window.firebaseDb) {
-                        const { collection, addDoc } = window.firebaseModules;
-                        submitBtn.innerText = "Uploading to Cloud...";
-
-                        try {
-                            await addDoc(collection(window.firebaseDb, "achievements"), {
-                                title: title,
-                                url: resizedBaseUrl,
-                                timestamp: Date.now()
-                            });
-                            achievementForm.reset();
-                            document.getElementById('file-chosen-text').textContent = "No file chosen yet";
-                            alert("Achievement photo uploaded successfully!");
-                        } catch (error) {
-                            console.error("Error adding document: ", error);
-                            alert("Failed to upload achievement data to cloud. Check limits or network.");
-                        } finally {
-                            submitBtn.innerText = "Upload Photo";
-                            submitBtn.disabled = false;
-                        }
-                    }
-                };
-                img.onerror = () => {
-                    alert('Invalid image file. Please choose a valid image format.');
-                    submitBtn.innerText = "Upload Photo";
-                    submitBtn.disabled = false;
-                };
-                img.src = evt.target.result;
-            };
-
-            reader.readAsDataURL(file);
-        } else {
-            alert('Please attach an image and enter a description.');
-        }
-    });
-}
-
 window.deleteAchievement = async function (id) {
-    if (confirm("Remove this achievement photo?")) {
-        if (!window.firebaseDb) return;
-        const { doc, deleteDoc } = window.firebaseModules;
-        try {
-            await deleteDoc(doc(window.firebaseDb, "achievements", id));
-            // UI updates automatically via onSnapshot listener
-        } catch (error) {
-            console.error("Error deleting achievement: ", error);
-            alert("Error deleting achievement.");
-        }
-    }
+    if (!window.firebaseDb) return;
+    if (!confirm('Remove this achievement photo?')) return;
+    const { doc, deleteDoc } = window.firebaseModules;
+    try { await deleteDoc(doc(window.firebaseDb, 'achievements', id)); }
+    catch (err) { console.error(err); alert('Error deleting achievement'); }
 }
 
-// Start Firebase Listeners with retry logic
+// Initialize Firebase listeners
 function initializeAdminFirebase() {
-    if (window.firebaseDb && window.firebaseModules && adminAchievementsList) {
-        const { collection, onSnapshot, query, orderBy } = window.firebaseModules;
+    if (!window.firebaseDb || !window.firebaseModules || !adminAchievementsList) return setTimeout(initializeAdminFirebase, 100);
 
-        // Listen for Feedbacks
-        // Limit initial fetch to most recent 50 feedbacks to reduce load time on admin dashboard
-        const qF = query(collection(window.firebaseDb, "feedbacks"), orderBy("timestamp", "desc"), window.firebaseModules.limit(50));
-        const loadingEl = document.getElementById('feedback-loading');
-        onSnapshot(qF, (snapshot) => {
-            const feedbacks = [];
-            snapshot.forEach((doc) => feedbacks.push({ id: doc.id, ...doc.data() }));
-            renderAdminFeedbacks(feedbacks);
-            if (loadingEl) loadingEl.style.display = 'none';
-        }, (err) => {
-            console.error('Feedback snapshot error:', err);
-            if (loadingEl) {
-                loadingEl.style.display = 'block';
-                loadingEl.querySelector('div:last-child').textContent = 'Error loading feedback.';
-            }
-        });
+    const { collection, onSnapshot, query, orderBy, limit } = window.firebaseModules;
 
-        // Listen for Achievements
-        const qA = query(collection(window.firebaseDb, "achievements"), orderBy("timestamp", "desc"));
-        onSnapshot(qA, (snapshot) => {
-            const achievements = [];
-            snapshot.forEach((doc) => achievements.push({ id: doc.id, ...doc.data() }));
-            renderAdminAchievements(achievements);
-        });
-    } else {
-        setTimeout(initializeAdminFirebase, 100);
-    }
+    // Feedback
+    const qF = query(collection(window.firebaseDb, 'feedbacks'), orderBy('timestamp', 'desc'), limit(50));
+    onSnapshot(qF, snapshot => {
+        const feedbacks = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderAdminFeedbacks(feedbacks);
+    });
+
+    // Achievements
+    const qA = query(collection(window.firebaseDb, 'achievements'), orderBy('timestamp', 'desc'));
+    onSnapshot(qA, snapshot => {
+        const achievements = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderAdminAchievements(achievements);
+    });
 }
 
 initializeAdminFirebase();
 
-// Change password UI behavior
+// ======================= Change Password =======================
 const changePassBtn = document.getElementById('change-pass-btn');
 const changePassModal = document.getElementById('change-pass-modal');
 const closeChangePass = document.getElementById('close-change-pass');
 const changePassForm = document.getElementById('change-pass-form');
 
-if (changePassBtn && changePassModal) {
-    changePassBtn.addEventListener('click', () => changePassModal.classList.add('show'));
-}
-if (closeChangePass && changePassModal) {
-    closeChangePass.addEventListener('click', () => changePassModal.classList.remove('show'));
-}
-window.addEventListener('click', (e) => {
-    if (e.target === changePassModal) changePassModal.classList.remove('show');
-});
+if (changePassBtn && changePassModal) changePassBtn.addEventListener('click', () => changePassModal.classList.add('show'));
+if (closeChangePass && changePassModal) closeChangePass.addEventListener('click', () => changePassModal.classList.remove('show'));
+window.addEventListener('click', e => { if (e.target === changePassModal) changePassModal.classList.remove('show'); });
 
 if (changePassForm) {
-    changePassForm.addEventListener('submit', async (e) => {
+    changePassForm.addEventListener('submit', async e => {
         e.preventDefault();
         const oldPass = document.getElementById('old-pass').value;
         const newPass = document.getElementById('new-pass').value;
         const confirmPass = document.getElementById('confirm-pass').value;
 
-        const stored = localStorage.getItem('teclipse_admin_password') || '2003@esai';
-        if (oldPass !== stored) return alert('Current password is incorrect.');
-        if (newPass !== confirmPass) return alert('New passwords do not match.');
-
-        // Validate: min 8 chars, letters, numbers, special char
+        if (newPass !== confirmPass) return alert('New passwords do not match');
         const valid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(newPass);
-        if (!valid) return alert('Password must be at least 8 chars and include letters, numbers and a special character.');
+        if (!valid) return alert('Password must be 8+ chars with letters, numbers & special char');
 
-        // Save new password
-        localStorage.setItem('teclipse_admin_password', newPass);
-
-        // Try to send a confirmation email via mailto (opens user's mail client)
-        const subject = encodeURIComponent('Teclipse Admin Password Changed');
-        const body = encodeURIComponent(`The admin password was changed successfully on ${new Date().toLocaleString()}. If this was not you, please investigate.`);
-        // Open mail client (best-effort notification)
-        window.open(`mailto:teclipseeducationhub@gmail.com?subject=${subject}&body=${body}`);
-
-        alert('Password updated successfully. A confirmation mail has been prepared to send.');
-        changePassModal.classList.remove('show');
-        changePassForm.reset();
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'changePass', oldPass, newPass })
+            });
+            const data = await res.json();
+            if (!res.ok) return alert(data.error || 'Failed to change password');
+            alert(data.message || 'Password change success (update env manually for full effect)');
+            changePassForm.reset();
+            changePassModal.classList.remove('show');
+        } catch (err) { console.error(err); alert('Server error, try again later'); }
     });
 }
