@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+console.log("JS LOADED ✅");
+
 /* ================= THEME ================= */
 const htmlEl = document.documentElement;
 
@@ -33,6 +35,20 @@ const navbar = document.querySelector('.navbar');
 window.addEventListener('scroll', () => {
     if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 20);
 });
+
+/* ================= ADMIN MODAL ================= */
+const loginBtn = document.getElementById("login-btn");
+const mobileLoginBtn = document.getElementById("mobile-login-btn");
+const modal = document.getElementById("login-modal");
+const closeModal = document.getElementById("close-modal");
+
+if (loginBtn) loginBtn.onclick = () => modal.style.display = "flex";
+if (mobileLoginBtn) mobileLoginBtn.onclick = () => modal.style.display = "flex";
+if (closeModal) closeModal.onclick = () => modal.style.display = "none";
+
+window.onclick = (e) => {
+    if (e.target === modal) modal.style.display = "none";
+};
 
 /* ================= ADMIN LOGIN ================= */
 const adminForm = document.getElementById('admin-login-form');
@@ -113,7 +129,7 @@ if (feedbackForm) {
                 });
             }
 
-            // Email API (correct path)
+            // Email API
             await fetch("/api/sendemail", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -181,6 +197,32 @@ function loadTestimonials() {
 
 loadTestimonials();
 
+/* BUTTON CONTROLS */
+const nextBtn = document.getElementById("next-btn");
+const prevBtn = document.getElementById("prev-btn");
+
+if (nextBtn) {
+    nextBtn.onclick = () => {
+        const slides = document.querySelectorAll('.testimonial-slide');
+        if (slides.length === 0) return;
+
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    };
+}
+
+if (prevBtn) {
+    prevBtn.onclick = () => {
+        const slides = document.querySelectorAll('.testimonial-slide');
+        if (slides.length === 0) return;
+
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        slides[currentSlide].classList.add('active');
+    };
+}
+
 /* ================= ACHIEVEMENTS ================= */
 function loadAchievements() {
     const gallery = document.getElementById('achievements-gallery');
@@ -198,7 +240,7 @@ function loadAchievements() {
             card.className = "achievement-card";
 
             card.innerHTML = `
-                <img src="${data.image}" style="width:100%; border-radius:10px;">
+                <img src="${data.image || data.imageUrl || ''}" style="width:100%; border-radius:10px;">
                 <p>${data.title || ''}</p>
             `;
 
