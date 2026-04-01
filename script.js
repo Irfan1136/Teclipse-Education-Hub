@@ -280,7 +280,7 @@ if (feedbackForm) {
                 method: 'POST',
                 headers: {
                     'accept': 'application/json',
-                    'api-key': 'YOUR_BREVO_API_KEY_HERE', /* SECURITY WARNING: Never hardcode API keys in frontend JS! */
+                    'api-key': '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', /* SECURITY WARNING: Never hardcode API keys in frontend JS! */
                     'content-type': 'application/json'
                 },
                 body: JSON.stringify(payload)
