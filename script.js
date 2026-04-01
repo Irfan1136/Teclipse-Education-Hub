@@ -1,4 +1,6 @@
-// ================= THEME =================
+document.addEventListener("DOMContentLoaded", () => {
+
+/* ================= THEME ================= */
 const htmlEl = document.documentElement;
 
 function updateIcon(isDark) {
@@ -26,13 +28,13 @@ document.querySelectorAll('#theme-toggle, #theme-toggle-admin').forEach(btn => {
 
 initTheme();
 
-// ================= NAVBAR =================
+/* ================= NAVBAR ================= */
 const navbar = document.querySelector('.navbar');
 window.addEventListener('scroll', () => {
     if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 20);
 });
 
-// ================= ADMIN LOGIN =================
+/* ================= ADMIN LOGIN ================= */
 const adminForm = document.getElementById('admin-login-form');
 
 if (adminForm) {
@@ -65,7 +67,7 @@ if (adminForm) {
     });
 }
 
-// ================= STAR RATING =================
+/* ================= STAR RATING ================= */
 const stars = document.querySelectorAll('.star');
 const ratingInput = document.getElementById('rating-value');
 
@@ -80,7 +82,7 @@ stars.forEach(star => {
     });
 });
 
-// ================= FEEDBACK =================
+/* ================= FEEDBACK ================= */
 const feedbackForm = document.getElementById('feedback-form');
 
 if (feedbackForm) {
@@ -111,7 +113,7 @@ if (feedbackForm) {
                 });
             }
 
-            // Email API
+            // Email API (correct path)
             await fetch("/api/sendemail", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -129,7 +131,22 @@ if (feedbackForm) {
     });
 }
 
-// ================= TESTIMONIALS =================
+/* ================= TESTIMONIALS ================= */
+let currentSlide = 0;
+let sliderInterval;
+
+function startSlider(slides) {
+    if (sliderInterval) clearInterval(sliderInterval);
+
+    sliderInterval = setInterval(() => {
+        if (slides.length === 0) return;
+
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }, 3000);
+}
+
 function loadTestimonials() {
     const slider = document.getElementById('testimonial-slider');
     if (!slider || !window.firebaseDb) return;
@@ -138,10 +155,9 @@ function loadTestimonials() {
 
     const q = query(collection(window.firebaseDb, "feedbacks"), orderBy("timestamp", "desc"));
 
-    let currentSlide = 0;
-
     onSnapshot(q, (snapshot) => {
         slider.innerHTML = "";
+        currentSlide = 0;
 
         snapshot.forEach((doc, index) => {
             const data = doc.data();
@@ -159,20 +175,13 @@ function loadTestimonials() {
         });
 
         const slides = document.querySelectorAll('.testimonial-slide');
-
-        setInterval(() => {
-            if (slides.length === 0) return;
-
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }, 3000);
+        startSlider(slides);
     });
 }
 
 loadTestimonials();
 
-// ================= ACHIEVEMENTS =================
+/* ================= ACHIEVEMENTS ================= */
 function loadAchievements() {
     const gallery = document.getElementById('achievements-gallery');
     if (!gallery || !window.firebaseDb) return;
@@ -189,7 +198,7 @@ function loadAchievements() {
             card.className = "achievement-card";
 
             card.innerHTML = `
-                <img src="${data.image || data.imageUrl}" style="width:100%; border-radius:10px;">
+                <img src="${data.image}" style="width:100%; border-radius:10px;">
                 <p>${data.title || ''}</p>
             `;
 
@@ -199,3 +208,5 @@ function loadAchievements() {
 }
 
 loadAchievements();
+
+});
