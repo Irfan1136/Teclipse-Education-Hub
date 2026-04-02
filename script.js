@@ -162,9 +162,8 @@ function renderMainAchievements(achievements) {
         const div = document.createElement('div');
         div.classList.add('achievement-card');
         div.innerHTML = `
-            <img src="${a.image || 'default-achievement.png'}" alt="${a.title}">
-            <h4>${a.title || ''}</h4>
-            <p>${a.subtitle || ''}</p>
+            <img src="${a.image}" alt="${a.caption}">
+            <h4>${a.caption}</h4>
         `;
         gallery.appendChild(div);
     });
@@ -226,10 +225,10 @@ if (feedbackForm) {
                 rating: parseInt(document.getElementById('rating-value').value) || 0,
                 timestamp: new Date()
             });
-            alert("Feedback submitted successfully!");
             feedbackForm.reset();
             ratingInput.value = 0;
             highlightStars(0);
+            alert("Feedback submitted successfully!");
         } catch (err) {
             console.error("Feedback error:", err);
             alert("Failed to submit feedback. Try again later.");
