@@ -11,7 +11,7 @@ export default async function handler(req, res){
                 "api-key": process.env.BREVO_API_KEY
             },
             body: JSON.stringify({
-                sender: { name: "Teclipse", email: "teclipseeducationhub@gmail.com" },
+                sender: { name: "Teclipse", email: "no-reply@brevo.com" },
                 to: [{ email: "irsparks011@gmail.com", name: "Admin" }],
                 subject: `New Feedback from ${name}`,
                 htmlContent: `<p><strong>Name:</strong> ${name}</p>
