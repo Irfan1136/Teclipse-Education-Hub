@@ -655,7 +655,7 @@ document.getElementById("feedback-form").addEventListener("submit", async functi
 
     // Send to your Brevo API via sendEmail.js
     try {
-        const res = await fetch("/api/sendEmail", { // your Vercel serverless function
+        const res = await fetch("/api/sendemail", { // your Vercel serverless function
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, email, rating, message })
