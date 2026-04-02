@@ -1,6 +1,5 @@
 // ================================
-// --- Theme Management --- 
-// ================================
+// --- Theme Management ---
 const themeToggles = document.querySelectorAll('#theme-toggle, #theme-toggle-admin');
 const htmlEl = document.documentElement;
 
@@ -39,8 +38,7 @@ themeToggles.forEach(toggle => {
 initTheme();
 
 // ================================
-// --- Navbar Scroll & Mobile Menu --- 
-// ================================
+// --- Navbar Scroll & Mobile Menu ---
 const navbar = document.getElementById('navbar');
 const mobileBtn = document.getElementById('mobile-menu-btn');
 const mobileSidebar = document.getElementById('mobile-sidebar');
@@ -70,8 +68,7 @@ document.querySelectorAll('.mobile-nav-link').forEach(link => {
 });
 
 // ================================
-// --- Active Nav Link on Scroll --- 
-// ================================
+// --- Active Nav Link on Scroll ---
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-links a, .mobile-links a.mobile-nav-link');
 
@@ -102,8 +99,7 @@ window.addEventListener('scroll', setActiveLink);
 window.addEventListener('load', setActiveLink);
 
 // ================================
-// --- Modals & Admin Login --- 
-// ================================
+// --- Modals & Admin Login ---
 const loginModal = document.getElementById('login-modal');
 const loginBtns = [document.getElementById('login-btn'), document.getElementById('mobile-login-btn')];
 const closeModal = document.getElementById('close-modal');
@@ -129,14 +125,13 @@ if (adminForm) {
             localStorage.setItem('teclipse_admin_auth', 'true');
             window.location.href = 'admin.html';
         } else {
-            alert("Invalid Email or Password. Please ensure you use the correct Admin credentials.");
+            alert("Invalid Email or Password.");
         }
     });
 }
 
 // ================================
-// --- Star Rating --- 
-// ================================
+// --- Star Rating ---
 const stars = document.querySelectorAll('.star');
 const ratingInput = document.getElementById('rating-value');
 
@@ -158,8 +153,7 @@ stars.forEach(star => {
 });
 
 // ================================
-// --- Firebase Achievements & Testimonials --- 
-// ================================
+// --- Firebase Render Functions ---
 function renderMainAchievements(achievements) {
     const gallery = document.getElementById('achievements-gallery');
     if (!gallery) return;
@@ -167,7 +161,11 @@ function renderMainAchievements(achievements) {
     achievements.forEach(a => {
         const div = document.createElement('div');
         div.classList.add('achievement-card');
-        div.innerHTML = `<img src="${a.image}" alt="${a.title}"><h4>${a.title}</h4>`;
+        div.innerHTML = `
+            <img src="${a.image || 'default-achievement.png'}" alt="${a.title}">
+            <h4>${a.title || ''}</h4>
+            <p>${a.subtitle || ''}</p>
+        `;
         gallery.appendChild(div);
     });
 }
@@ -179,14 +177,17 @@ function renderTestimonials(feedbacks) {
     feedbacks.forEach(f => {
         const div = document.createElement('div');
         div.classList.add('testimonial-slide');
-        div.innerHTML = `<p>"${f.message}"</p><h4>${f.name}</h4>`;
+        div.innerHTML = `
+            <p>"${f.message}"</p>
+            <h4>${f.name}</h4>
+            <span class="rating">${'★'.repeat(f.rating || 0)}</span>
+        `;
         slider.appendChild(div);
     });
 }
 
 // ================================
-// --- Fetch Firebase Data --- 
-// ================================
+// --- Fetch Firebase Data ---
 async function fetchFeedbacks() {
     if (!window.firebaseDb) return;
     const { collection, onSnapshot, query, orderBy } = window.firebaseModules;
@@ -201,8 +202,6 @@ async function fetchFeedbacks() {
 async function fetchAchievements() {
     if (!window.firebaseDb) return;
     const { collection, onSnapshot, query, orderBy } = window.firebaseModules;
-    const gallery = document.getElementById('achievements-gallery');
-    if (!gallery) return;
     const q = query(collection(window.firebaseDb, "achievements"), orderBy("timestamp", "desc"));
     onSnapshot(q, snapshot => {
         const achievements = [];
@@ -212,8 +211,7 @@ async function fetchAchievements() {
 }
 
 // ================================
-// --- Feedback Form Submit --- 
-// ================================
+// --- Feedback Form Submit ---
 const feedbackForm = document.getElementById('feedback-form');
 if (feedbackForm) {
     feedbackForm.addEventListener('submit', async e => {
@@ -225,7 +223,7 @@ if (feedbackForm) {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
                 message: document.getElementById('message').value,
-                rating: document.getElementById('rating-value').value || 0,
+                rating: parseInt(document.getElementById('rating-value').value) || 0,
                 timestamp: new Date()
             });
             alert("Feedback submitted successfully!");
@@ -240,8 +238,7 @@ if (feedbackForm) {
 }
 
 // ================================
-// --- Initialize Firebase Listeners --- 
-// ================================
+// --- Initialize Firebase Listeners ---
 function initializeFirebaseListeners() {
     if (window.firebaseDb && window.firebaseModules) {
         fetchFeedbacks();
