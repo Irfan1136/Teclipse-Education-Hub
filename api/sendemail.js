@@ -1,46 +1,32 @@
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
+import fetch from "node-fetch";
 
-  try {
-    const { name, email, message, rating } = req.body;
+export default async function handler(req, res){
+    if(req.method === "POST"){
+        const { name, email, rating, message } = req.body;
 
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY,
-      },
-      body: JSON.stringify({
-        sender: {
-          name: "Teclipse",
-          email: "teclipseeducationhub@gmail.com" // MUST be verified in Brevo
-        },
-        to: [{ email: "irsparks011@gmail.com" }],
-        subject: "New Feedback Received",
-        htmlContent: `
-          <h2>New Feedback</h2>
-          <p><b>Name:</b> ${name}</p>
-          <p><b>Email:</b> ${email}</p>
-          <p><b>Rating:</b> ${rating}</p>
-          <p><b>Message:</b> ${message}</p>
-        `,
-      }),
-    });
+        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "api-key": process.env.BREVO_API_KEY
+            },
+            body: JSON.stringify({
+                sender: { name: "Teclipse", email: "teclipseeducationhub@gmail.com" },
+                to: [{ email: "irsparks011@gmail.com.com", name: "Admin" }],
+                subject: `New Feedback from ${name}`,
+                htmlContent: `<p><strong>Name:</strong> ${name}</p>
+                              <p><strong>Email:</strong> ${email}</p>
+                              <p><strong>Rating:</strong> ${rating}</p>
+                              <p><strong>Message:</strong> ${message}</p>`
+            })
+        });
 
-    const data = await response.json();
-
-    console.log("BREVO RESPONSE:", data); // 🔥 IMPORTANT DEBUG
-
-    if (!response.ok) {
-      return res.status(500).json({ error: data });
+        if(response.ok){
+            res.status(200).json({ success: true });
+        } else {
+            res.status(500).json({ success: false });
+        }
+    } else {
+        res.status(405).json({ success: false, message: "Method not allowed" });
     }
-
-    return res.status(200).json({ success: true });
-
-  } catch (err) {
-    console.error("MAIL ERROR:", err);
-    return res.status(500).json({ error: "Mail failed" });
-  }
 }
