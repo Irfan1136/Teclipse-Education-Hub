@@ -1,4 +1,6 @@
-// --- Theme Management ---
+// ================================
+// --- Theme Management --- 
+// ================================
 const themeToggles = document.querySelectorAll('#theme-toggle, #theme-toggle-admin');
 const htmlEl = document.documentElement;
 
@@ -36,8 +38,9 @@ themeToggles.forEach(toggle => {
 
 initTheme();
 
-
-// --- Navbar Scroll & Mobile Menu ---
+// ================================
+// --- Navbar Scroll & Mobile Menu --- 
+// ================================
 const navbar = document.getElementById('navbar');
 const mobileBtn = document.getElementById('mobile-menu-btn');
 const mobileSidebar = document.getElementById('mobile-sidebar');
@@ -45,11 +48,8 @@ const overlay = document.getElementById('sidebar-overlay');
 const closeSidebar = document.getElementById('close-sidebar');
 
 if (navbar) {
-    let lastScroll = window.scrollY;
     window.addEventListener('scroll', () => {
-        const y = window.scrollY;
-        navbar.classList.toggle('scrolled', y > 20);
-        lastScroll = y;
+        navbar.classList.toggle('scrolled', window.scrollY > 20);
     });
 }
 
@@ -69,8 +69,9 @@ document.querySelectorAll('.mobile-nav-link').forEach(link => {
     });
 });
 
-
-// --- Active Nav Link on Scroll ---
+// ================================
+// --- Active Nav Link on Scroll --- 
+// ================================
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-links a, .mobile-links a.mobile-nav-link');
 
@@ -100,8 +101,9 @@ function setActiveLink() {
 window.addEventListener('scroll', setActiveLink);
 window.addEventListener('load', setActiveLink);
 
-
-// --- Modals & Admin Login ---
+// ================================
+// --- Modals & Admin Login --- 
+// ================================
 const loginModal = document.getElementById('login-modal');
 const loginBtns = [document.getElementById('login-btn'), document.getElementById('mobile-login-btn')];
 const closeModal = document.getElementById('close-modal');
@@ -132,10 +134,19 @@ if (adminForm) {
     });
 }
 
-
-// --- Star Rating ---
+// ================================
+// --- Star Rating --- 
+// ================================
 const stars = document.querySelectorAll('.star');
 const ratingInput = document.getElementById('rating-value');
+
+function highlightStars(value) {
+    stars.forEach(star => {
+        const val = star.dataset.value;
+        star.classList.toggle('bxs-star', val <= value);
+        star.classList.toggle('bx-star', val > value);
+    });
+}
 
 stars.forEach(star => {
     star.addEventListener('mouseover', () => highlightStars(star.dataset.value));
@@ -146,24 +157,43 @@ stars.forEach(star => {
     });
 });
 
-function highlightStars(value) {
-    stars.forEach(star => {
-        const val = star.dataset.value;
-        star.classList.toggle('bxs-star', val <= value);
-        star.classList.toggle('bx-star', val > value);
-        star.classList.toggle('active', val <= value);
+// ================================
+// --- Firebase Achievements & Testimonials --- 
+// ================================
+function renderMainAchievements(achievements) {
+    const gallery = document.getElementById('achievements-gallery');
+    if (!gallery) return;
+    gallery.innerHTML = '';
+    achievements.forEach(a => {
+        const div = document.createElement('div');
+        div.classList.add('achievement-card');
+        div.innerHTML = `<img src="${a.image}" alt="${a.title}"><h4>${a.title}</h4>`;
+        gallery.appendChild(div);
     });
 }
 
+function renderTestimonials(feedbacks) {
+    const slider = document.getElementById('testimonial-slider');
+    if (!slider) return;
+    slider.innerHTML = '';
+    feedbacks.forEach(f => {
+        const div = document.createElement('div');
+        div.classList.add('testimonial-slide');
+        div.innerHTML = `<p>"${f.message}"</p><h4>${f.name}</h4>`;
+        slider.appendChild(div);
+    });
+}
 
-// --- Feedback & Firebase ---
+// ================================
+// --- Fetch Firebase Data --- 
+// ================================
 async function fetchFeedbacks() {
     if (!window.firebaseDb) return;
     const { collection, onSnapshot, query, orderBy } = window.firebaseModules;
     const q = query(collection(window.firebaseDb, "feedbacks"), orderBy("timestamp", "desc"));
-    onSnapshot(q, querySnapshot => {
+    onSnapshot(q, snapshot => {
         const feedbacks = [];
-        querySnapshot.forEach(doc => feedbacks.push({ id: doc.id, ...doc.data() }));
+        snapshot.forEach(doc => feedbacks.push({ id: doc.id, ...doc.data() }));
         renderTestimonials(feedbacks);
     });
 }
@@ -174,14 +204,44 @@ async function fetchAchievements() {
     const gallery = document.getElementById('achievements-gallery');
     if (!gallery) return;
     const q = query(collection(window.firebaseDb, "achievements"), orderBy("timestamp", "desc"));
-    onSnapshot(q, querySnapshot => {
+    onSnapshot(q, snapshot => {
         const achievements = [];
-        querySnapshot.forEach(doc => achievements.push({ id: doc.id, ...doc.data() }));
+        snapshot.forEach(doc => achievements.push({ id: doc.id, ...doc.data() }));
         renderMainAchievements(achievements);
     });
 }
 
-// Initialize Firebase listeners
+// ================================
+// --- Feedback Form Submit --- 
+// ================================
+const feedbackForm = document.getElementById('feedback-form');
+if (feedbackForm) {
+    feedbackForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        if (!window.firebaseDb) return alert("Firebase not initialized!");
+        const { collection, addDoc } = window.firebaseModules;
+        try {
+            await addDoc(collection(window.firebaseDb, "feedbacks"), {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value,
+                rating: document.getElementById('rating-value').value || 0,
+                timestamp: new Date()
+            });
+            alert("Feedback submitted successfully!");
+            feedbackForm.reset();
+            ratingInput.value = 0;
+            highlightStars(0);
+        } catch (err) {
+            console.error("Feedback error:", err);
+            alert("Failed to submit feedback. Try again later.");
+        }
+    });
+}
+
+// ================================
+// --- Initialize Firebase Listeners --- 
+// ================================
 function initializeFirebaseListeners() {
     if (window.firebaseDb && window.firebaseModules) {
         fetchFeedbacks();
