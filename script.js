@@ -655,23 +655,38 @@ document.getElementById("feedback-form").addEventListener("submit", async functi
 
     // Send to your Brevo API via sendEmail.js
     try {
-        const res = await fetch("/api/sendemail", { // your Vercel serverless function
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, rating, message })
-        });
+      const form = document.getElementById("feedback-form");
 
-        const data = await res.json();
-        if(data.success){
-            alert("Feedback sent successfully!");
-            this.reset();
-        } else {
-            alert("Failed to send feedback. Try again later.");
-        }
-    } catch(err){
-        console.error(err);
-        alert("Something went wrong.");
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = {
+    name: form.name.value,
+    email: form.email.value,
+    rating: form.rating.value,
+    message: form.message.value
+  };
+
+  try {
+    const res = await fetch("/api/sendEmail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData)
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert("Feedback sent successfully!");
+      form.reset();
+    } else {
+      console.error("Backend Error:", data.error || data.message);
+      alert("Something went wrong. Check console for details.");
     }
+  } catch (err) {
+    console.error("Fetch Error:", err);
+    alert("Something went wrong. Check console for details.");
+  }
 });
 
 // Initialize listeners - retry until window.firebaseModules is ready
