@@ -12,7 +12,7 @@ export default async function handler(req, res){
             },
             body: JSON.stringify({
                 sender: { name: "Teclipse", email: "teclipseeducationhub@gmail.com" },
-                to: [{ email: "irsparks011@gmail.com.com", name: "Admin" }],
+                to: [{ email: "irsparks011@gmail.com", name: "Admin" }],
                 subject: `New Feedback from ${name}`,
                 htmlContent: `<p><strong>Name:</strong> ${name}</p>
                               <p><strong>Email:</strong> ${email}</p>
