@@ -75,11 +75,20 @@ function generateAdminStars(rating) {
     return html;
 }
 
-// FIX: Firestore stores `timestamp` as a number — `fb.date` never existed
+// ✅ FIX: formatDate now handles Firestore Timestamp objects, JS Date objects, and numbers
 function formatDate(ts) {
     if (!ts) return '—';
     try {
-        return new Date(ts).toLocaleDateString('en-IN', {
+        // Firestore Timestamp object has .toDate() method
+        if (ts && typeof ts.toDate === 'function') {
+            return ts.toDate().toLocaleDateString('en-IN', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+        }
+        // Plain JS Date or number/string timestamp
+        const d = new Date(ts);
+        if (isNaN(d.getTime())) return '—';
+        return d.toLocaleDateString('en-IN', {
             day: '2-digit', month: 'short', year: 'numeric'
         });
     } catch { return '—'; }
@@ -92,6 +101,10 @@ const adminAchievementsList = document.getElementById('admin-achievements-list')
 
 /* ── Render Feedbacks ── */
 function renderAdminFeedbacks(feedbacks) {
+    // Hide loading spinner once data arrives
+    const loadingEl = document.getElementById('feedback-loading');
+    if (loadingEl) loadingEl.style.display = 'none';
+
     if (!feedbackList) return;
     feedbackList.innerHTML = '';
     if (cardsContainer) cardsContainer.innerHTML = '';
@@ -154,16 +167,27 @@ function toggleFeedbackView() {
 }
 window.addEventListener('resize', toggleFeedbackView);
 
+// ✅ FIX: deleteFeedback — was failing silently because firebaseModules
+// didn't include `doc` and `deleteDoc` in index.html's Firebase import.
+// Now defensively checks and gives clear error if modules missing.
 window.deleteFeedback = async function(id) {
-    if (!window.firebaseDb) return;
-    if (!confirm('Delete this feedback?')) return;
+    if (!window.firebaseDb) {
+        showToast("Firebase not ready. Try again.", "error");
+        return;
+    }
+    if (!window.firebaseModules || !window.firebaseModules.doc || !window.firebaseModules.deleteDoc) {
+        showToast("Delete module not loaded. Check Firebase imports in admin.html.", "error");
+        console.error("Missing doc/deleteDoc in window.firebaseModules:", window.firebaseModules);
+        return;
+    }
+    if (!confirm('Delete this feedback permanently?')) return;
     const { doc, deleteDoc } = window.firebaseModules;
     try {
         await deleteDoc(doc(window.firebaseDb, 'feedbacks', id));
-        showToast("Feedback deleted", "success");
+        showToast("Feedback deleted successfully", "success");
     } catch (err) {
-        console.error(err);
-        showToast("Error deleting feedback", "error");
+        console.error("Delete feedback error:", err);
+        showToast("Error deleting feedback: " + err.message, "error");
     }
 };
 
