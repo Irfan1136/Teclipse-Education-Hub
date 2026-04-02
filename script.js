@@ -153,36 +153,173 @@ stars.forEach(star => {
 });
 
 // ================================
+// --- Testimonial Slider State ---
+let sliderIndex = 0;
+let sliderInterval = null;
+
+function initTestimonialSlider() {
+    const slides = document.querySelectorAll('.testimonial-slide');
+    if (!slides.length) return;
+
+    // Reset index safely
+    sliderIndex = 0;
+
+    // Clear any previous auto-play interval
+    if (sliderInterval) clearInterval(sliderInterval);
+
+    function showSlide(index) {
+        slides.forEach((s, i) => {
+            s.classList.remove('active');
+            s.style.display = 'none';
+        });
+        slides[index].classList.add('active');
+        slides[index].style.display = 'block';
+    }
+
+    showSlide(sliderIndex);
+
+    // Prev Button
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    // Remove old listeners by cloning buttons
+    if (prevBtn) {
+        const newPrev = prevBtn.cloneNode(true);
+        prevBtn.parentNode.replaceChild(newPrev, prevBtn);
+        newPrev.addEventListener('click', () => {
+            sliderIndex = (sliderIndex - 1 + slides.length) % slides.length;
+            showSlide(sliderIndex);
+            resetAutoPlay();
+        });
+    }
+
+    if (nextBtn) {
+        const newNext = nextBtn.cloneNode(true);
+        nextBtn.parentNode.replaceChild(newNext, nextBtn);
+        newNext.addEventListener('click', () => {
+            sliderIndex = (sliderIndex + 1) % slides.length;
+            showSlide(sliderIndex);
+            resetAutoPlay();
+        });
+    }
+
+    // Auto play every 4 seconds
+    function startAutoPlay() {
+        sliderInterval = setInterval(() => {
+            sliderIndex = (sliderIndex + 1) % slides.length;
+            showSlide(sliderIndex);
+        }, 4000);
+    }
+
+    function resetAutoPlay() {
+        if (sliderInterval) clearInterval(sliderInterval);
+        startAutoPlay();
+    }
+
+    startAutoPlay();
+}
+
+// ================================
 // --- Firebase Render Functions ---
+
+// ✅ FIX: Achievements rendered as a LEFT-TO-RIGHT GRID
 function renderMainAchievements(achievements) {
     const gallery = document.getElementById('achievements-gallery');
     if (!gallery) return;
     gallery.innerHTML = '';
+
+    // Apply grid layout directly via inline style as a fallback guarantee
+    gallery.style.display = 'grid';
+    gallery.style.gridTemplateColumns = 'repeat(auto-fill, minmax(220px, 1fr))';
+    gallery.style.gap = '1.5rem';
+    gallery.style.padding = '2rem 1rem';
+    gallery.style.width = '100%';
+    gallery.style.boxSizing = 'border-box';
+
+    if (achievements.length === 0) {
+        gallery.innerHTML = '<p style="color:#aaa; text-align:center; grid-column:1/-1;">No achievements added yet.</p>';
+        return;
+    }
+
     achievements.forEach(a => {
         const div = document.createElement('div');
         div.classList.add('achievement-card');
-        div.innerHTML = `
-            <img src="${a.image}" alt="${a.caption}">
-            <h4>${a.caption}</h4>
+
+        // Inline style ensures card always looks correct regardless of external CSS
+        div.style.cssText = `
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            text-align: center;
+            padding-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
         `;
+
+        div.innerHTML = `
+            <img 
+                src="${a.image}" 
+                alt="${a.caption || 'Achievement'}"
+                onerror="this.onerror=null; this.src='https://placehold.co/300x200/1a2a4a/ffffff?text=Achievement';"
+                style="width:100%; height:180px; object-fit:cover; display:block;"
+            >
+            <h4 style="
+                margin: 0.75rem 0.5rem 0.25rem;
+                color: #fff;
+                font-size: 0.95rem;
+                font-weight: 600;
+            ">${a.caption || ''}</h4>
+        `;
+
+        // Hover effect
+        div.addEventListener('mouseenter', () => {
+            div.style.transform = 'translateY(-5px)';
+            div.style.boxShadow = '0 8px 25px rgba(0,0,0,0.35)';
+        });
+        div.addEventListener('mouseleave', () => {
+            div.style.transform = 'translateY(0)';
+            div.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+        });
+
         gallery.appendChild(div);
     });
 }
 
+// ✅ FIX: Testimonials rendered then slider initialized after
 function renderTestimonials(feedbacks) {
     const slider = document.getElementById('testimonial-slider');
     if (!slider) return;
     slider.innerHTML = '';
-    feedbacks.forEach(f => {
-        const div = document.createElement('div');
-        div.classList.add('testimonial-slide');
-        div.innerHTML = `
-            <p>"${f.message}"</p>
-            <h4>${f.name}</h4>
-            <span class="rating">${'★'.repeat(f.rating || 0)}</span>
-        `;
-        slider.appendChild(div);
-    });
+
+    if (feedbacks.length === 0) {
+        const empty = document.createElement('div');
+        empty.classList.add('testimonial-slide');
+        empty.style.cssText = 'text-align:center; padding: 2rem; color: #aaa;';
+        empty.innerHTML = '<p>No reviews yet. Be the first to share your experience!</p>';
+        slider.appendChild(empty);
+    } else {
+        feedbacks.forEach(f => {
+            const div = document.createElement('div');
+            div.classList.add('testimonial-slide');
+
+            // Generate star display
+            const rating = parseInt(f.rating) || 0;
+            const filledStars = '★'.repeat(rating);
+            const emptyStars = '☆'.repeat(5 - rating);
+
+            div.innerHTML = `
+                <p style="font-size:1.05rem; line-height:1.7; color:#ccc; font-style:italic;">"${f.message}"</p>
+                <h4 style="margin-top:1rem; font-weight:700; color:#fff;">${f.name}</h4>
+                <span class="rating" style="color:#f5c518; font-size:1.2rem;">${filledStars}<span style="color:#555;">${emptyStars}</span></span>
+            `;
+
+            slider.appendChild(div);
+        });
+    }
+
+    // ✅ KEY FIX: Initialize slider AFTER slides are injected into DOM
+    initTestimonialSlider();
 }
 
 // ================================
@@ -226,8 +363,10 @@ if (feedbackForm) {
                 timestamp: new Date()
             });
             feedbackForm.reset();
-            ratingInput.value = 0;
-            highlightStars(0);
+            if (ratingInput) {
+                ratingInput.value = 0;
+                highlightStars(0);
+            }
             alert("Feedback submitted successfully!");
         } catch (err) {
             console.error("Feedback error:", err);
