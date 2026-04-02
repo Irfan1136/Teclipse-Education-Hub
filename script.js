@@ -644,6 +644,35 @@ async function fetchAchievements() {
         renderMainAchievements(achievements);
     });
 }
+document.getElementById("feedback-form").addEventListener("submit", async function(e){
+    e.preventDefault(); // stop default form submit
+
+    // Collect form values
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const rating = document.getElementById("rating-value").value;
+    const message = document.getElementById("message").value;
+
+    // Send to your Brevo API via sendEmail.js
+    try {
+        const res = await fetch("/api/sendEmail", { // your Vercel serverless function
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, rating, message })
+        });
+
+        const data = await res.json();
+        if(data.success){
+            alert("Feedback sent successfully!");
+            this.reset();
+        } else {
+            alert("Failed to send feedback. Try again later.");
+        }
+    } catch(err){
+        console.error(err);
+        alert("Something went wrong.");
+    }
+});
 
 // Initialize listeners - retry until window.firebaseModules is ready
 function initializeFirebaseListeners() {
