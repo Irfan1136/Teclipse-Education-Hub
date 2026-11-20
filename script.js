@@ -1,12 +1,16 @@
-// ================================
 // --- Theme Management ---
 const themeToggles = document.querySelectorAll('#theme-toggle, #theme-toggle-admin');
 const htmlEl = document.documentElement;
 
 function updateIcon(isDark) {
     document.querySelectorAll('#theme-icon, #theme-icon-admin').forEach(icon => {
-        icon.classList.toggle('bx-sun', isDark);
-        icon.classList.toggle('bx-moon', !isDark);
+        if (isDark) {
+            icon.classList.remove('bx-moon');
+            icon.classList.add('bx-sun');
+        } else {
+            icon.classList.remove('bx-sun');
+            icon.classList.add('bx-moon');
+        }
     });
 }
 
@@ -20,8 +24,10 @@ function initTheme() {
         updateIcon(false);
     } else {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        htmlEl.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-        updateIcon(prefersDark);
+        if (prefersDark) {
+            htmlEl.setAttribute('data-theme', 'dark');
+            updateIcon(true);
+        }
     }
 }
 
@@ -37,7 +43,7 @@ themeToggles.forEach(toggle => {
 
 initTheme();
 
-// ================================
+
 // --- Navbar Scroll & Mobile Menu ---
 const navbar = document.getElementById('navbar');
 const mobileBtn = document.getElementById('mobile-menu-btn');
@@ -46,28 +52,38 @@ const overlay = document.getElementById('sidebar-overlay');
 const closeSidebar = document.getElementById('close-sidebar');
 
 if (navbar) {
+    // Debounced scroll handler to avoid jitter and repeated toggles
+    let lastScroll = window.scrollY;
+    let scrollTimeout = null;
     window.addEventListener('scroll', () => {
-        navbar.classList.toggle('scrolled', window.scrollY > 20);
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const y = window.scrollY;
+            if (y > 20 && !navbar.classList.contains('scrolled')) {
+                navbar.classList.add('scrolled');
+            } else if (y <= 20 && navbar.classList.contains('scrolled')) {
+                navbar.classList.remove('scrolled');
+            }
+            lastScroll = y;
+        }, 60);
     });
 }
 
 function toggleMenu() {
-    if (mobileSidebar) mobileSidebar.classList.toggle('open');
-    if (overlay) overlay.classList.toggle('open');
+    mobileSidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
 }
-
 if (mobileBtn) mobileBtn.addEventListener('click', toggleMenu);
 if (closeSidebar) closeSidebar.addEventListener('click', toggleMenu);
 if (overlay) overlay.addEventListener('click', toggleMenu);
 
 document.querySelectorAll('.mobile-nav-link').forEach(link => {
     link.addEventListener('click', () => {
-        if (mobileSidebar) mobileSidebar.classList.remove('open');
-        if (overlay) overlay.classList.remove('open');
+        mobileSidebar.classList.remove('open');
+        overlay.classList.remove('open');
     });
 });
 
-// ================================
 // --- Active Nav Link on Scroll ---
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-links a, .mobile-links a.mobile-nav-link');
@@ -77,436 +93,531 @@ function setActiveLink() {
     const scrollY = window.scrollY;
 
     sections.forEach(section => {
-        const sectionTop = section.offsetTop - 150;
         const sectionHeight = section.offsetHeight;
+        const sectionTop = section.offsetTop - 150;
         if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-            current = section.id;
+            current = section.getAttribute('id');
         }
     });
 
-    if ((window.innerHeight + Math.round(scrollY)) >= document.body.offsetHeight - 50) {
-        if (sections.length > 0) current = sections[sections.length - 1].id;
+    // Handle being at the bottom of the page
+    if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight - 50) {
+        if (sections.length > 0) current = sections[sections.length - 1].getAttribute('id');
     }
 
-    navLinks.forEach(link => link.classList.remove('active'));
     navLinks.forEach(link => {
-        if (current && link.getAttribute('href') === `#${current}`) link.classList.add('active');
-        else if (!current && scrollY < 300 && link.getAttribute('href') === '#home') link.classList.add('active');
+        link.classList.remove('active');
+        if (current && link.getAttribute('href') === `#${current}`) {
+            link.classList.add('active');
+        } else if (!current && scrollY < 300) {
+            if (link.getAttribute('href') === '#home') link.classList.add('active');
+        }
     });
 }
 
 window.addEventListener('scroll', setActiveLink);
 window.addEventListener('load', setActiveLink);
 
-// ================================
-// --- Modals & Admin Login ---
+
+// --- Modals ---
+const loginBtn = document.getElementById('login-btn');
+const mobileLoginBtn = document.getElementById('mobile-login-btn');
 const loginModal = document.getElementById('login-modal');
-const loginBtns = [document.getElementById('login-btn'), document.getElementById('mobile-login-btn')];
 const closeModal = document.getElementById('close-modal');
 
-loginBtns.forEach(btn => {
-    if (btn) btn.addEventListener('click', e => {
-        if (e) e.preventDefault();
-        if (loginModal) loginModal.classList.add('show');
+if (loginBtn && loginModal) {
+    loginBtn.addEventListener('click', () => { loginModal.classList.add('show'); });
+    mobileLoginBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginModal.classList.add('show');
     });
-});
+    closeModal.addEventListener('click', () => { loginModal.classList.remove('show'); });
+    window.addEventListener('click', (e) => {
+        if (e.target === loginModal) loginModal.classList.remove('show');
+    });
+}
 
-if (closeModal) closeModal.addEventListener('click', () => loginModal.classList.remove('show'));
-window.addEventListener('click', e => {
-    if (loginModal && e.target === loginModal) loginModal.classList.remove('show');
-});
-
+// Admin Login Form
 const adminForm = document.getElementById('admin-login-form');
 if (adminForm) {
-    adminForm.addEventListener('submit', e => {
+    adminForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('admin-email').value;
         const pass = document.getElementById('admin-pass').value;
+
+        // Use stored admin password in localStorage with a default fallback
         const storedPass = localStorage.getItem('teclipse_admin_password') || '2003@esai';
         if (email === 'teclipseeducationhub@gmail.com' && pass === storedPass) {
             localStorage.setItem('teclipse_admin_auth', 'true');
             window.location.href = 'admin.html';
         } else {
-            alert("Invalid Email or Password.");
+            alert("Invalid Email or Password. Please ensure you use the correct Admin credentials.");
         }
     });
 }
 
-// ================================
-// --- ✅ Star Rating — Gold Color Fix ---
+// --- Star Rating ---
 const stars = document.querySelectorAll('.star');
 const ratingInput = document.getElementById('rating-value');
 
-const starRatingContainer = document.getElementById('star-rating');
-if (starRatingContainer) {
-    starRatingContainer.style.cssText = 'display:flex; gap:6px; font-size:2rem; cursor:pointer; margin-top:4px;';
-}
+stars.forEach(star => {
+    star.addEventListener('mouseover', function () { highlightStars(this.getAttribute('data-value')); });
+    star.addEventListener('mouseout', function () { highlightStars(ratingInput.value || 0); });
+    star.addEventListener('click', function () {
+        const val = this.getAttribute('data-value');
+        ratingInput.value = val;
+        highlightStars(val);
+    });
+});
 
 function highlightStars(value) {
-    const numVal = parseInt(value) || 0;
     stars.forEach(star => {
-        const starVal = parseInt(star.dataset.value);
-        if (starVal <= numVal) {
-            star.classList.remove('bx-star');
-            star.classList.add('bxs-star');
-            star.style.color = '#f5c518';
+        if (star.getAttribute('data-value') <= value) {
+            star.classList.replace('bx-star', 'bxs-star');
+            star.classList.add('active');
         } else {
-            star.classList.remove('bxs-star');
-            star.classList.add('bx-star');
-            star.style.color = '#888';
+            star.classList.replace('bxs-star', 'bx-star');
+            star.classList.remove('active');
         }
     });
 }
 
-stars.forEach(star => {
-    star.style.transition = 'color 0.15s ease, transform 0.15s ease';
-    star.addEventListener('mouseover', () => {
-        highlightStars(star.dataset.value);
-        star.style.transform = 'scale(1.2)';
-    });
-    star.addEventListener('mouseout', () => {
-        highlightStars(ratingInput ? ratingInput.value : 0);
-        star.style.transform = 'scale(1)';
-    });
-    star.addEventListener('click', () => {
-        if (ratingInput) ratingInput.value = star.dataset.value;
-        highlightStars(star.dataset.value);
-    });
-});
+// --- Feedback Data management (Firebase) ---
+async function fetchFeedbacks() {
+    if (!window.firebaseDb) return;
+    const { collection, onSnapshot, query, orderBy } = window.firebaseModules;
+    const q = query(collection(window.firebaseDb, "feedbacks"), orderBy("timestamp", "desc"));
 
-// ================================
-// --- Testimonial Slider ---
-let sliderIndex = 0;
-let sliderInterval = null;
-
-function initTestimonialSlider() {
-    const slides = document.querySelectorAll('.testimonial-slide');
-    if (!slides.length) return;
-
-    sliderIndex = 0;
-    if (sliderInterval) clearInterval(sliderInterval);
-
-    function showSlide(index) {
-        slides.forEach(s => {
-            s.style.display = 'none';
-            s.classList.remove('active');
+    onSnapshot(q, (querySnapshot) => {
+        const feedbacks = [];
+        querySnapshot.forEach((doc) => {
+            feedbacks.push({ id: doc.id, ...doc.data() });
         });
-        slides[index].style.display = 'block';
-        slides[index].classList.add('active');
-    }
 
-    showSlide(sliderIndex);
-
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-
-    if (prevBtn) {
-        const newPrev = prevBtn.cloneNode(true);
-        prevBtn.parentNode.replaceChild(newPrev, prevBtn);
-        newPrev.addEventListener('click', () => {
-            sliderIndex = (sliderIndex - 1 + slides.length) % slides.length;
-            showSlide(sliderIndex);
-            resetAutoPlay();
-        });
-    }
-
-    if (nextBtn) {
-        const newNext = nextBtn.cloneNode(true);
-        nextBtn.parentNode.replaceChild(newNext, nextBtn);
-        newNext.addEventListener('click', () => {
-            sliderIndex = (sliderIndex + 1) % slides.length;
-            showSlide(sliderIndex);
-            resetAutoPlay();
-        });
-    }
-
-    function startAutoPlay() {
-        sliderInterval = setInterval(() => {
-            sliderIndex = (sliderIndex + 1) % slides.length;
-            showSlide(sliderIndex);
-        }, 4000);
-    }
-
-    function resetAutoPlay() {
-        if (sliderInterval) clearInterval(sliderInterval);
-        startAutoPlay();
-    }
-
-    startAutoPlay();
+        // Show all reviews on the main page
+        renderTestimonials(feedbacks);
+    });
 }
 
-// ================================
-// --- ✅ FIX: Render Achievements ---
-// admin.js saves image as `url` field — renderMainAchievements must read `ach.url`
-// Also builds mobile horizontal scroll slider with prev/next buttons
-function renderMainAchievements(achievements) {
-    const gallery = document.getElementById('achievements-gallery');
-    if (!gallery) return;
-    gallery.innerHTML = '';
+// Feedback submission
+const feedbackForm = document.getElementById('feedback-form');
+if (feedbackForm) {
+    feedbackForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!ratingInput.value) return alert('Please select a star rating.');
 
-    if (!achievements || achievements.length === 0) {
-        gallery.style.display = 'block';
-        gallery.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:2rem 0;">No achievements uploaded yet.</p>`;
+        const submitBtn = feedbackForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerText;
+        submitBtn.innerText = 'Sending...';
+        submitBtn.disabled = true;
+
+        const name = document.getElementById('name').value.toUpperCase();
+        const email = document.getElementById('email').value;
+        const rating = parseInt(ratingInput.value);
+        const message = document.getElementById('message').value;
+
+        // 1. Save to Firebase
+        try {
+            if (window.firebaseDb && window.firebaseModules) {
+                const { collection, addDoc } = window.firebaseModules;
+                await addDoc(collection(window.firebaseDb, "feedbacks"), {
+                    name,
+                    email,
+                    rating,
+                    message,
+                    date: new Date().toLocaleDateString(),
+                    timestamp: Date.now()
+                });
+                console.log("Feedback successfully written to Firestore!");
+            } else {
+                console.error("Firebase is not initialized yet. Cannot save feedback.");
+                alert("Database connection is still loading. Please try again in a few seconds.");
+                submitBtn.innerText = originalBtnText;
+                submitBtn.disabled = false;
+                return; // Stop execution if DB is not ready
+            }
+        } catch (error) {
+            console.error("Error saving feedback to database: ", error);
+            alert("Failed to connect to the database. Please check your internet connection and try again.");
+            submitBtn.innerText = originalBtnText;
+            submitBtn.disabled = false;
+            return; // Stop execution
+        }
+
+        // 2. Send Email using Firebase Cloud Function
+        const backendConfig = window.appConfig?.backendEmail || { enabled: false, sendFeedbackUrl: '' };
+
+        if (backendConfig.enabled) {
+            try {
+                const response = await fetch(backendConfig.sendFeedbackUrl, {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, rating, message })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    console.warn('Email notification failed:', data);
+                }
+            } catch (error) {
+                console.error('Error submitting feedback email:', error);
+            }
+        } else {
+            console.log('Backend email delivery is disabled. Feedback will still be saved to Firebase.');
+        }
+
+        alert('Thank you! Your feedback has been submitted successfully.');
+        feedbackForm.reset();
+        ratingInput.value = '';
+        highlightStars(0);
+
+        submitBtn.innerText = originalBtnText;
+        submitBtn.disabled = false;
+    });
+}
+
+
+// --- Testimonial Slider (Auto & Manual) ---
+let currentSlide = 0;
+let slideElements = [];
+let slideInterval;
+
+function generateStars(rating) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+        html += i <= rating ? "<i class='bx bxs-star'></i>" : "<i class='bx bx-star'></i>";
+    }
+    return html;
+}
+
+function renderTestimonials(visibleFeedbacks = []) {
+    const slider = document.getElementById('testimonial-slider');
+    if (!slider) return;
+
+    slider.innerHTML = '';
+    if (visibleFeedbacks.length === 0) {
+        slider.innerHTML = '<div class="empty-state">No reviews yet.</div>';
         return;
     }
 
-    const isMobile = window.innerWidth <= 768;
-
-    if (isMobile) {
-        // ── Mobile: horizontal scroll slider with Prev / Next buttons ──
-        gallery.style.cssText = 'position:relative; width:100%; padding: 0 0 1rem 0; box-sizing:border-box;';
-
-        // Scroll track
-        const track = document.createElement('div');
-        track.id = 'ach-track';
-        track.style.cssText = `
-            display: flex;
-            gap: 1rem;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            padding: 0.5rem 1rem 1rem;
+    visibleFeedbacks.forEach((fb, index) => {
+        const slide = document.createElement('div');
+        slide.className = `testimonial-slide ${index === 0 ? 'active' : ''}`;
+        slide.innerHTML = `
+            <div class="stars">${generateStars(fb.rating)}</div>
+            <p class="review-text">"${fb.message}"</p>
+            <h4 class="reviewer-name">- ${fb.name}</h4>
         `;
-        track.style.setProperty('-webkit-overflow-scrolling', 'touch');
+        slider.appendChild(slide);
+    });
 
-        // Hide native scrollbar via inline style trick
-        const styleTag = document.getElementById('ach-scroll-style') || document.createElement('style');
-        styleTag.id = 'ach-scroll-style';
-        styleTag.textContent = '#ach-track::-webkit-scrollbar { display: none; }';
-        document.head.appendChild(styleTag);
+    slideElements = document.querySelectorAll('.testimonial-slide');
+    currentSlide = 0;
 
-        achievements.forEach(a => {
-            const imgSrc = a.url || a.image || a.imageUrl || a.imageData || '';
-            const caption = a.title || a.caption || '';
-            const card = document.createElement('div');
-            card.style.cssText = `
-                min-width: 220px;
-                max-width: 220px;
-                flex-shrink: 0;
-                background: rgba(255,255,255,0.05);
-                border-radius: 12px;
+    startAutoSlide();
+}
+
+function nextSlide() {
+    if (slideElements.length <= 1) return;
+    slideElements[currentSlide].classList.remove('active');
+    currentSlide++;
+    if (currentSlide >= slideElements.length) currentSlide = 0;
+    slideElements[currentSlide].classList.add('active');
+}
+
+function prevSlide() {
+    if (slideElements.length <= 1) return;
+    slideElements[currentSlide].classList.remove('active');
+    currentSlide--;
+    if (currentSlide < 0) currentSlide = slideElements.length - 1;
+    slideElements[currentSlide].classList.add('active');
+}
+
+function startAutoSlide() {
+    clearInterval(slideInterval);
+    slideInterval = setInterval(nextSlide, 3000);
+}
+
+if (document.getElementById('testimonial-slider')) {
+    renderTestimonials();
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+        nextSlide();
+        startAutoSlide(); // reset timer on manual click
+    });
+
+    document.getElementById('prev-btn').addEventListener('click', () => {
+        prevSlide();
+        startAutoSlide(); // reset timer on manual click
+    });
+
+    // Pause auto slide on hover
+    const sliderContainer = document.querySelector('.testimonial-slider-container');
+    sliderContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
+    sliderContainer.addEventListener('mouseleave', () => startAutoSlide());
+}
+
+// --- Main Page Achievements Rendering (Firebase) ---
+let achievementSlideInterval;
+
+function renderMainAchievements(achievements = []) {
+    const gallery = document.getElementById('achievements-gallery');
+    if (!gallery) return;
+
+    if (achievements.length === 0) {
+        gallery.innerHTML = '<div style="text-align: center; width: 100%; grid-column: 1 / -1; color: var(--text-muted);"><p>No achievements uploaded yet.</p></div>';
+        return;
+    }
+
+    // Add required CSS dynamically if not present
+    if (!document.getElementById('achievement-slider-style')) {
+        const style = document.createElement('style');
+        style.id = 'achievement-slider-style';
+        style.textContent = `
+            .achievements-slider-wrapper {
+                position: relative;
+                display: flex;
+                align-items: center;
+                width: 100%;
+            }
+            #achievements-gallery {
+                display: flex;
+                gap: 1.5rem;
+                overflow-x: auto;
+                padding: 2rem 50% 3rem 50%;
+                scroll-snap-type: x mandatory;
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none; /* IE/Edge */
+                scroll-behavior: smooth;
+                width: 100%;
+            }
+            #achievements-gallery::-webkit-scrollbar {
+                display: none; /* Chrome/Safari */
+            }
+            .achievement-card {
+                flex: 0 0 auto;
+                width: 320px;
+                scroll-snap-align: center;
+                border-radius: var(--radius-lg);
                 overflow: hidden;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                text-align: center;
-                padding-bottom: 0.75rem;
-            `;
-            card.innerHTML = `
-                <img src="${imgSrc}" alt="${caption}"
-                    style="width:100%;height:160px;object-fit:cover;display:block;"
-                    onerror="this.style.display='none';">
-                <h4 style="margin:0.6rem 0.5rem 0;color:var(--text-main,#fff);font-size:0.85rem;font-weight:600;">${caption}</h4>
-            `;
-            track.appendChild(card);
-        });
+                box-shadow: var(--shadow-sm);
+                transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+                opacity: 0.6;
+                transform: scale(0.85);
+            }
+            .achievement-card.active {
+                opacity: 1;
+                transform: scale(1.1);
+                box-shadow: var(--shadow-lg);
+                z-index: 10;
+            }
+            .achievement-card img {
+                width: 100%;
+                height: 250px;
+                object-fit: contain;
+                background-color: #000;
+                display: block;
+            }
+            
+            /* Buttons for achievements */
+            .ach-btn {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background: var(--primary-color);
+                color: #fff;
+                border: none;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                cursor: pointer;
+                box-shadow: var(--shadow-md);
+                z-index: 20;
+                transition: background 0.3s;
+            }
+            .ach-btn:hover { background: var(--accent-color); }
+            .ach-btn.prev { left: 10px; }
+            .ach-btn.next { right: 10px; }
 
-        // Prev button
+            @media (max-width: 768px) {
+                #achievements-gallery {
+                    padding: 2rem 50% 3rem 50%;
+                }
+                .achievement-card {
+                    width: 260px;
+                }
+                .achievement-card img {
+                    height: 200px;
+                }
+                .ach-btn {
+                    width: 35px;
+                    height: 35px;
+                    font-size: 1.2rem;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    let html = '';
+    achievements.forEach((ach, index) => {
+        html += `
+            <div class="achievement-card" id="ach-card-${index}">
+                <img src="${ach.url}" alt="${ach.title}" onerror="this.outerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#eee;color:#999;font-size:1.2rem;\\'>Image Error</div>';">
+                <div style="padding: 1rem; background: var(--card-bg); text-align: center;">
+                    <h4 style="font-size: 1.1rem; color: var(--text-main); margin: 0;">${ach.title}</h4>
+                </div>
+            </div>
+        `;
+    });
+
+    gallery.innerHTML = html;
+
+    // Add buttons dynamically if they don't exist
+    let wrapper = gallery.parentElement;
+    if (!wrapper.classList.contains('achievements-slider-wrapper')) {
+        wrapper = document.createElement('div');
+        wrapper.className = 'achievements-slider-wrapper';
+        gallery.parentNode.insertBefore(wrapper, gallery);
+        wrapper.appendChild(gallery);
+
         const prevBtn = document.createElement('button');
-        prevBtn.innerHTML = `<i class='bx bx-chevron-left'></i>`;
-        prevBtn.style.cssText = `
-            position:absolute; left:4px; top:50%; transform:translateY(-60%);
-            z-index:10; background:var(--primary-color,#1e3a8a); color:#fff;
-            border:none; border-radius:50%; width:36px; height:36px;
-            font-size:1.3rem; cursor:pointer; display:flex;
-            align-items:center; justify-content:center;
-            box-shadow:0 2px 8px rgba(0,0,0,0.3);
-        `;
-        prevBtn.addEventListener('click', () => { track.scrollBy({ left: -240, behavior: 'smooth' }); });
+        prevBtn.className = 'ach-btn prev';
+        prevBtn.innerHTML = "<i class='bx bx-chevron-left'></i>";
+        prevBtn.id = "ach-prev-btn";
 
-        // Next button
         const nextBtn = document.createElement('button');
-        nextBtn.innerHTML = `<i class='bx bx-chevron-right'></i>`;
-        nextBtn.style.cssText = `
-            position:absolute; right:4px; top:50%; transform:translateY(-60%);
-            z-index:10; background:var(--primary-color,#1e3a8a); color:#fff;
-            border:none; border-radius:50%; width:36px; height:36px;
-            font-size:1.3rem; cursor:pointer; display:flex;
-            align-items:center; justify-content:center;
-            box-shadow:0 2px 8px rgba(0,0,0,0.3);
-        `;
-        nextBtn.addEventListener('click', () => { track.scrollBy({ left: 240, behavior: 'smooth' }); });
+        nextBtn.className = 'ach-btn next';
+        nextBtn.innerHTML = "<i class='bx bx-chevron-right'></i>";
+        nextBtn.id = "ach-next-btn";
 
-        gallery.appendChild(prevBtn);
-        gallery.appendChild(track);
-        gallery.appendChild(nextBtn);
+        wrapper.insertBefore(prevBtn, gallery);
+        wrapper.appendChild(nextBtn);
+    }
 
-    } else {
-        // ── Desktop: grid layout ──
-        gallery.style.cssText = `
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1.5rem;
-            padding: 1rem;
-            width: 100%;
-            box-sizing: border-box;
-        `;
+    // Scroll Logic
+    const cards = document.querySelectorAll('.achievement-card');
+    let currentIndex = 0; // State to track index directly
+    let isGalleryVisible = false;
 
-        achievements.forEach(a => {
-            // ✅ admin.js stores image as `url` — this is the correct field
-            const imgSrc = a.url || a.image || a.imageUrl || a.imageData || '';
-            const caption = a.title || a.caption || '';
+    // Check if gallery is actually on screen so we don't slide/jump when user is reading other sections
+    const visibilityObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            isGalleryVisible = entry.isIntersecting;
+        });
+    }, { threshold: 0.1 }); // Only need 10% visibility to allow sliding
+    visibilityObserver.observe(gallery);
 
-            const div = document.createElement('div');
-            div.classList.add('achievement-card');
-            div.style.cssText = `
-                background: rgba(255,255,255,0.05);
-                border-radius: 12px;
-                overflow: hidden;
-                text-align: center;
-                padding-bottom: 1rem;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-            `;
-            div.innerHTML = `
-                <img src="${imgSrc}" alt="${caption}"
-                    style="width:100%;height:200px;object-fit:cover;display:block;"
-                    onerror="this.style.display='none';">
-                <h4 style="margin:0.75rem 0.75rem 0.25rem;color:var(--text-main,#fff);
-                           font-size:0.95rem;font-weight:600;line-height:1.4;">${caption}</h4>
-            `;
-            div.addEventListener('mouseenter', () => {
-                div.style.transform = 'translateY(-6px)';
-                div.style.boxShadow = '0 10px 30px rgba(0,0,0,0.4)';
+    function scrollToCard(index) {
+        if (cards.length === 0 || !cards[index]) return;
+
+        // Calculate exact scroll left coordinate
+        const card = cards[index];
+        const scrollPosition = card.offsetLeft - (gallery.clientWidth / 2) + (card.clientWidth / 2);
+
+        gallery.scrollTo({
+            left: scrollPosition,
+            behavior: 'smooth'
+        });
+    }
+
+    function scrollNext() {
+        if (cards.length === 0 || !isGalleryVisible) return;
+
+        currentIndex++;
+        if (currentIndex >= cards.length) {
+            currentIndex = 0; // Loop back
+        }
+        scrollToCard(currentIndex);
+    }
+
+    function scrollPrev() {
+        if (cards.length === 0) return;
+
+        currentIndex--;
+        if (currentIndex < 0) {
+            currentIndex = cards.length - 1; // Loop back to end
+        }
+        scrollToCard(currentIndex);
+    }
+
+    function startAchAutoSlide() {
+        clearInterval(achievementSlideInterval);
+        achievementSlideInterval = setInterval(scrollNext, 2500);
+    }
+
+    document.getElementById('ach-next-btn').onclick = () => {
+        scrollNext();
+        startAchAutoSlide();
+    };
+
+    document.getElementById('ach-prev-btn').onclick = () => {
+        scrollPrev();
+        startAchAutoSlide();
+    };
+
+    // Pause on hover
+    wrapper.onmouseenter = () => clearInterval(achievementSlideInterval);
+    wrapper.onmouseleave = () => startAchAutoSlide();
+
+
+    // Observe Which Card is Centered (Only for applying CSS effects, NOT index math)
+    setTimeout(() => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    cards.forEach(c => c.classList.remove('active'));
+                    entry.target.classList.add('active');
+                }
             });
-            div.addEventListener('mouseleave', () => {
-                div.style.transform = 'translateY(0)';
-                div.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
-            });
-            gallery.appendChild(div);
+        }, {
+            root: gallery,
+            threshold: 0.6
         });
-    }
+
+        cards.forEach(card => observer.observe(card));
+
+        if (cards.length > 0) {
+            setTimeout(() => {
+                scrollToCard(0);
+                startAchAutoSlide(); // Start slide after initial center
+            }, 100);
+        }
+    }, 100);
 }
 
-// Re-render achievements on resize so mobile/desktop layout switches correctly
-let resizeTimer;
-window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-        if (window._lastAchievements) renderMainAchievements(window._lastAchievements);
-    }, 300);
-});
-
-// ================================
-// --- Render Testimonials ---
-function renderTestimonials(feedbacks) {
-    const slider = document.getElementById('testimonial-slider');
-    if (!slider) return;
-    slider.innerHTML = '';
-
-    if (!feedbacks || feedbacks.length === 0) {
-        const empty = document.createElement('div');
-        empty.classList.add('testimonial-slide');
-        empty.style.cssText = 'text-align:center;padding:2rem;color:#aaa;';
-        empty.innerHTML = '<p>No reviews yet. Be the first to share your experience!</p>';
-        slider.appendChild(empty);
-    } else {
-        feedbacks.forEach(f => {
-            const div = document.createElement('div');
-            div.classList.add('testimonial-slide');
-            const rating = parseInt(f.rating) || 0;
-            const filledStars = '★'.repeat(rating);
-            const emptyStars  = '☆'.repeat(5 - rating);
-            div.innerHTML = `
-                <p style="font-size:1.05rem;line-height:1.7;color:var(--text-muted,#ccc);font-style:italic;">
-                    "${f.message}"
-                </p>
-                <h4 style="margin-top:1rem;font-weight:700;color:var(--text-main,#fff);">
-                    ${f.name}
-                </h4>
-                <span style="color:#f5c518;font-size:1.3rem;letter-spacing:2px;">
-                    ${filledStars}<span style="color:#555;">${emptyStars}</span>
-                </span>
-            `;
-            slider.appendChild(div);
-        });
-    }
-
-    initTestimonialSlider();
-}
-
-// ================================
-// --- ✅ FIX: Fetch Firebase Data ---
-// Uses onSnapshot for real-time updates
-async function fetchFeedbacks() {
-    if (!window.firebaseDb || !window.firebaseModules) return;
-    const { collection, onSnapshot, query, orderBy } = window.firebaseModules;
-    try {
-        const q = query(collection(window.firebaseDb, 'feedbacks'), orderBy('timestamp', 'desc'));
-        onSnapshot(q, snapshot => {
-            const feedbacks = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            renderTestimonials(feedbacks);
-        }, err => {
-            console.error('Feedbacks listener error:', err);
-            renderTestimonials([]);
-        });
-    } catch (err) {
-        console.error('fetchFeedbacks error:', err);
-        renderTestimonials([]);
-    }
-}
-
+// Fetch Achievements from Firebase Listener
 async function fetchAchievements() {
-    if (!window.firebaseDb || !window.firebaseModules) return;
+    if (!window.firebaseDb) return;
     const { collection, onSnapshot, query, orderBy } = window.firebaseModules;
-    try {
-        const q = query(collection(window.firebaseDb, 'achievements'), orderBy('timestamp', 'desc'));
-        onSnapshot(q, snapshot => {
-            const achievements = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            // Store globally so resize handler can re-render
-            window._lastAchievements = achievements;
-            renderMainAchievements(achievements);
-        }, err => {
-            console.error('Achievements listener error:', err);
-            renderMainAchievements([]);
+
+    // Check if gallery exists on this page before querying
+    if (!document.getElementById('achievements-gallery')) return;
+
+    const q = query(collection(window.firebaseDb, "achievements"), orderBy("timestamp", "desc"));
+
+    onSnapshot(q, (querySnapshot) => {
+        const achievements = [];
+        querySnapshot.forEach((doc) => {
+            achievements.push({ id: doc.id, ...doc.data() });
         });
-    } catch (err) {
-        console.error('fetchAchievements error:', err);
-        renderMainAchievements([]);
-    }
-}
-
-// ================================
-// --- Feedback Form Submit ---
-const feedbackForm = document.getElementById('feedback-form');
-if (feedbackForm) {
-    feedbackForm.addEventListener('submit', async e => {
-        e.preventDefault();
-        if (!window.firebaseDb) return alert('Firebase not initialized!');
-        const { collection, addDoc } = window.firebaseModules;
-
-        const ratingVal = parseInt(ratingInput ? ratingInput.value : 0) || 0;
-        if (ratingVal === 0) {
-            alert('Please select a star rating before submitting.');
-            return;
-        }
-
-        try {
-            await addDoc(collection(window.firebaseDb, 'feedbacks'), {
-                name:      document.getElementById('name').value,
-                email:     document.getElementById('email').value,
-                message:   document.getElementById('message').value,
-                rating:    ratingVal,
-                timestamp: new Date()
-            });
-
-            feedbackForm.reset();
-            if (ratingInput) ratingInput.value = 0;
-            highlightStars(0);
-            alert('Feedback submitted successfully! Thank you.');
-        } catch (err) {
-            console.error('Feedback submit error:', err);
-            alert('Failed to submit feedback. Try again later.');
-        }
+        renderMainAchievements(achievements);
     });
 }
 
-// ================================
-// --- Initialize Firebase Listeners ---
+// Initialize listeners - retry until window.firebaseModules is ready
 function initializeFirebaseListeners() {
     if (window.firebaseDb && window.firebaseModules) {
         fetchFeedbacks();
         fetchAchievements();
     } else {
+        // Retry every 100ms until the module scripts load
         setTimeout(initializeFirebaseListeners, 100);
     }
 }

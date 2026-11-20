@@ -154,7 +154,8 @@
     <section id="home" class="hero">
         <div class="hero-content">
             <h1 class="hero-title">Build Your Career in <span>Technology</span></h1>
-            <p class="hero-subtitle">We provide hands-on learning in Programming, AI, Full Stack Development, and Data Analytics, helping bridge the gap between academics and real-world skills. Our services include mini projects, final year project development, and professional project reports, along with real-time development and mentorship to help students build strong portfolios and become industry-ready.</p>
+            <p class="hero-subtitle">Master Programming, AI, Full Stack Development, and Data Analytics. Structured
+                learning to bridge the gap between passion and profession.</p>
             <div class="hero-btns">
                 <a href="#courses" class="btn btn-primary">Explore Courses</a>
                 <a href="https://wa.me/919943150099?text=I%20have%20interested%20about%20teclipse%20please%20share%20about!!"
@@ -385,7 +386,7 @@
                         advanced technology-driven education systems.</p>
 
                     <p>We distinguish ourselves by offering an <strong>Advanced Syllabus</strong> that is constantly
-                        updated to match the rapid shifts in the global tech industry.And we offer mini projects, final year project development, and professional reports with real-time implementation and guidance, helping students gain practical knowledge and complete projects with confidence. Whether you are a student
+                        updated to match the rapid shifts in the global tech industry. Whether you are a student
                         starting from scratch or a professional looking to upskill, Teclipse provides the roadmap you
                         need to master the digital landscape.</p>
                 </div>
@@ -444,7 +445,10 @@
                         see it along with your picture on our student board.</p>
                 </div>
                 <div class="feedback-form-container">
-                   <form id="feedback-form" class="form">
+                    <form id="feedback-form" class="form" action="#" method="POST">
+                        <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+                        <input type="hidden" name="subject" value="New Student Feedback - Teclipse">
+                        <input type="hidden" name="from_name" value="Teclipse Notifications">
 
                         <div class="input-group">
                             <label for="name">Name</label>
@@ -582,21 +586,12 @@
     </a>
 
     <!-- Firebase SDK Setup -->
+    <script src="config.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC37pyEKLFOtC-nOecaRsz9wCq_blcb-CU",
-            authDomain: "teclipse-education-hub.firebaseapp.com",
-            projectId: "teclipse-education-hub",
-            storageBucket: "teclipse-education-hub.firebasestorage.app",
-            messagingSenderId: "224399410151",
-            appId: "1:224399410151:web:2a85668a8b2bb60e9f3342",
-            measurementId: "G-E4Z5PP7NCZ"
-        };
-
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp(window.appConfig.firebaseConfig);
         const db = getFirestore(app);
 
         // Make db globally available to script.js

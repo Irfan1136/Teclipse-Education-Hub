@@ -143,21 +143,12 @@
     </main>
 
     <!-- Firebase SDK Setup -->
+    <script src="config.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC37pyEKLFOtC-nOecaRsz9wCq_blcb-CU",
-            authDomain: "teclipse-education-hub.firebaseapp.com",
-            projectId: "teclipse-education-hub",
-            storageBucket: "teclipse-education-hub.firebasestorage.app",
-            messagingSenderId: "224399410151",
-            appId: "1:224399410151:web:2a85668a8b2bb60e9f3342",
-            measurementId: "G-E4Z5PP7NCZ"
-        };
-
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp(window.appConfig.firebaseConfig);
         const db = getFirestore(app);
 
         // Make db globally available to admin.js
