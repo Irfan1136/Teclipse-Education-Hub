@@ -11,6 +11,6 @@ window.appConfig = {
     backendEmail: {
         enabled: true,
         // Replace <your-vercel-project> with the actual Vercel deployment domain
-        sendFeedbackUrl: 'https://<your-vercel-project>.vercel.app/api/sendFeedback'
+        sendFeedbackUrl: 'https://teclipse-11.vercel.app/api/sendFeedback'
     }
 };
