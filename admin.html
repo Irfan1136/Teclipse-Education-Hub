@@ -2,166 +2,150 @@
 <html lang="en" data-theme="light">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teclipse Admin Dashboard</title>
-    <link rel="icon" type="image/png" href="teclipse2.png">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Teclipse Admin Dashboard</title>
+  <link rel="icon" type="image/png" href="teclipse2.png">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 
-<body class="admin-body">
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <img src="teclipse2.png" alt="Teclipse" class="logo-img admin-logo-img" onerror="this.style.display='none'" />
-                <div class="logo-text" id="admin-logo-text" style="margin-left:0.5rem;">
-                    Teclipse
-                    <span>Education Hub</span>
-                </div>
-            </div>
-            <div class="nav-actions">
-                <button id="theme-toggle-admin" class="icon-btn" aria-label="Toggle Theme">
-                    <i class='bx bx-moon' id="theme-icon-admin"></i>
-                </button>
-                <button id="logout-btn" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
-            </div>
+<body class="admin-body" style="visibility:hidden">
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <img src="teclipse2.png" alt="Teclipse" class="logo-img admin-logo-img" onerror="this.style.display='none'" />
+        <div class="logo-text" id="admin-logo-text" style="margin-left:0.5rem;">
+          Teclipse
+          <span>Education Hub</span>
         </div>
-    </nav>
+      </div>
+      <div class="nav-actions">
+        <button id="theme-toggle-admin" class="icon-btn" aria-label="Toggle Theme">
+          <i class='bx bx-moon' id="theme-icon-admin"></i>
+        </button>
+        <button id="logout-btn" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
+      </div>
+    </div>
+  </nav>
 
-    <main class="admin-main-page">
-        <div class="section-container">
-            <div class="admin-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap:1rem;">
-                <div>
-                    <h2>Admin Dashboard</h2>
-                </div>
-                <div class="admin-header-actions" style="display:flex; gap:0.5rem; align-items:center;">
-                    <button id="change-pass-btn" class="btn btn-outline" style="font-size:0.9rem;">Change Password</button>
-                    <a href="index.html" class="btn btn-primary back-to-website" style="font-size: 0.9rem;">Back to Website</a>
-                </div>
-            </div>
-
-            <div class="admin-panel mt-4">
-                <div class="panel-header">
-                    <h3>Student Feedback & Reviews Management</h3>
-                </div>
-                <!-- Change Password Modal -->
-                <div id="change-pass-modal" class="modal">
-                    <div class="modal-content">
-                        <span class="close-modal" id="close-change-pass">&times;</span>
-                        <h3>Change Admin Password</h3>
-                        <form id="change-pass-form" class="form">
-                            <div class="input-group">
-                                <label for="old-pass">Current Password</label>
-                                <input type="password" id="old-pass" required />
-                            </div>
-                            <div class="input-group">
-                                <label for="new-pass">New Password</label>
-                                <input type="password" id="new-pass" required />
-                                <small>Password must be at least 8 characters and include letters, numbers and a special character.</small>
-                            </div>
-                            <div class="input-group">
-                                <label for="confirm-pass">Confirm New Password</label>
-                                <input type="password" id="confirm-pass" required />
-                            </div>
-                            <button type="submit" class="btn btn-primary">Update Password</button>
-                        </form>
-                    </div>
-                </div>
-                <div class="feedback-table-container" style="max-height: 400px; overflow-y: auto;">
-                    <!-- Mobile-friendly cards (hidden on desktop) -->
-                    <div id="admin-feedback-cards" class="admin-feedback-cards" style="display:none;"></div>
-                        <!-- Loading spinner while feedbacks are fetched -->
-                        <div id="feedback-loading" style="display:block; text-align:center; padding:1.5rem;">
-                            <div class="spinner" aria-hidden="true"></div>
-                            <div style="margin-top:8px; color:var(--text-muted);">Loading feedback...</div>
-                        </div>
-                        <table class="feedback-table">
-                        <thead style="position: sticky; top: 0; z-index: 10;">
-                            <tr>
-                                <th>Date</th>
-                                <th>Student Name</th>
-                                <th>Email</th>
-                                <th>Rating</th>
-                                <th>Message</th>
-                                <th style="text-align: right;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-feedback-list">
-                            <!-- JS will populate this -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Photos Upload Section -->
-            <div class="admin-panel" style="margin-top: 2rem;">
-                <div class="panel-header"
-                    style="background: linear-gradient(135deg, var(--accent-color), var(--primary-color));">
-                    <h3>Achievements Photo Upload</h3>
-                </div>
-                <div style="padding: 1.5rem;">
-                    <form id="upload-achievement-form" class="form" style="max-width: 500px;">
-                        <div class="input-group">
-                            <label for="achievement-desc">Photo Title / Description</label>
-                            <input type="text" id="achievement-desc" placeholder="E.g., Batch 2026 Success" required>
-                        </div>
-                        <div class="input-group" style="margin-bottom: 1.5rem;">
-                            <label>Photo File (Device)</label>
-                            <div class="file-upload-block"
-                                style="border: 2px dashed var(--primary-color); padding: 2rem 1rem; text-align: center; background: rgba(30, 58, 138, 0.03); border-radius: var(--radius-md); transition: background 0.3s; cursor: pointer;"
-                                onclick="document.getElementById('achievement-file').click()">
-                                <i class='bx bx-cloud-upload'
-                                    style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem;"></i>
-                                <h4 style="color: var(--text-main); font-size: 1rem; margin-bottom: 0.25rem;">Click to
-                                    Upload</h4>
-                                <span id="file-chosen-text"
-                                    style="color: var(--text-muted); font-size: 0.85rem; display: block;">No file chosen
-                                    yet</span>
-                            </div>
-                            <input type="file" id="achievement-file" accept="image/*" style="display: none;" required
-                                onchange="document.getElementById('file-chosen-text').textContent = this.files[0]?.name || 'No file chosen yet';">
-                            <small
-                                style="color: var(--text-muted); margin-top: 8px; display: block; text-align: center;">Format:
-                                JPG, PNG (Max 2MB)</small>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Upload Photo</button>
-                    </form>
-
-                    <div style="margin-top: 2.5rem;">
-                        <h4 style="margin-bottom: 1rem;">Uploaded Photos</h4>
-                        <div class="achievements-admin-grid" id="admin-achievements-list"
-                            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
-                            <!-- Injected by JS -->
-                            <p style="color: var(--text-muted);">Loading...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <main class="admin-main-page">
+    <div class="section-container">
+      <div class="admin-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap:1rem;">
+        <div>
+          <h2>Admin Dashboard</h2>
         </div>
-    </main>
+        <div class="admin-header-actions" style="display:flex; gap:0.5rem; align-items:center;">
+          <button id="change-pass-btn" class="btn btn-outline" style="font-size:0.9rem;">Change Password</button>
+          <a href="index.html" class="btn btn-primary back-to-website" style="font-size: 0.9rem;">Back to Website</a>
+        </div>
+      </div>
 
-    <!-- Firebase SDK Setup -->
-    <script src="config.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+      <div class="admin-panel mt-4">
+        <div class="panel-header">
+          <h3>Student Feedback & Reviews Management</h3>
+        </div>
 
-        const app = initializeApp(window.appConfig.firebaseConfig);
-        const db = getFirestore(app);
+        <!-- Change Password Modal (sends a Firebase reset email) -->
+        <div id="change-pass-modal" class="modal">
+          <div class="modal-content">
+            <span class="close-modal" id="close-change-pass">&times;</span>
+            <h3>Change Admin Password</h3>
+            <p style="margin: 0.5rem 0 1.25rem;">We'll email a secure password-reset link to your admin account.</p>
+            <form id="change-pass-form" class="form">
+              <button type="submit" class="btn btn-primary">Send Reset Email</button>
+            </form>
+          </div>
+        </div>
 
-        // Make db globally available to admin.js
-        window.firebaseDb = db;
-        window.firebaseModules = { collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy, limit };
-    </script>
-    <script src="admin.js"></script>
-    <script>
-        // Redirect if not authenticated (simple UI demo logic)
-        if (localStorage.getItem('teclipse_admin_auth') !== 'true') {
-            window.location.href = 'index.html';
-        }
-    </script>
+        <div class="feedback-table-container" style="max-height: 400px; overflow-y: auto;">
+          <!-- Mobile-friendly cards (hidden on desktop) -->
+          <div id="admin-feedback-cards" class="admin-feedback-cards" style="display:none;"></div>
+          <!-- Loading spinner while feedbacks are fetched -->
+          <div id="feedback-loading" style="display:block; text-align:center; padding:1.5rem;">
+            <div class="spinner" aria-hidden="true"></div>
+            <div style="margin-top:8px; color:var(--text-muted);">Loading feedback...</div>
+          </div>
+          <table class="feedback-table">
+            <thead style="position: sticky; top: 0; z-index: 10;">
+              <tr>
+                <th>Date</th>
+                <th>Student Name</th>
+                <th>Email</th>
+                <th>Rating</th>
+                <th>Message</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-feedback-list">
+              <!-- JS will populate this -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Photos Upload Section -->
+      <div class="admin-panel" style="margin-top: 2rem;">
+        <div class="panel-header"
+          style="background: linear-gradient(135deg, var(--accent-color), var(--primary-color));">
+          <h3>Achievements Photo Upload</h3>
+        </div>
+        <div style="padding: 1.5rem;">
+          <form id="upload-achievement-form" class="form" style="max-width: 500px;">
+            <div class="input-group">
+              <label for="achievement-desc">Photo Title / Description</label>
+              <input type="text" id="achievement-desc" placeholder="E.g., Batch 2026 Success" maxlength="120" required>
+            </div>
+            <div class="input-group" style="margin-bottom: 1.5rem;">
+              <label>Photo File (Device)</label>
+              <div class="file-upload-block"
+                style="border: 2px dashed var(--primary-color); padding: 2rem 1rem; text-align: center; background: rgba(30, 58, 138, 0.03); border-radius: var(--radius-md); transition: background 0.3s; cursor: pointer;"
+                onclick="document.getElementById('achievement-file').click()">
+                <i class='bx bx-cloud-upload'
+                  style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem;"></i>
+                <h4 style="color: var(--text-main); font-size: 1rem; margin-bottom: 0.25rem;">Click to Upload</h4>
+                <span id="file-chosen-text"
+                  style="color: var(--text-muted); font-size: 0.85rem; display: block;">No file chosen yet</span>
+              </div>
+              <input type="file" id="achievement-file" accept="image/*" style="display: none;" required
+                onchange="document.getElementById('file-chosen-text').textContent = this.files[0]?.name || 'No file chosen yet';">
+              <small style="color: var(--text-muted); margin-top: 8px; display: block; text-align: center;">Format:
+                JPG, PNG (Max 2MB)</small>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload Photo</button>
+          </form>
+
+          <div style="margin-top: 2.5rem;">
+            <h4 style="margin-bottom: 1rem;">Uploaded Photos</h4>
+            <div class="achievements-admin-grid" id="admin-achievements-list"
+              style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+              <!-- Injected by JS -->
+              <p style="color: var(--text-muted);">Loading...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Firebase SDK Setup -->
+  <script src="config.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+    const app = initializeApp(window.appConfig.firebaseConfig);
+
+    window.firebaseDb = getFirestore(app);
+    window.firebaseModules = { collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy, limit };
+
+    window.firebaseAuth = getAuth(app);
+    window.firebaseAuthModules = { onAuthStateChanged, signOut, sendPasswordResetEmail };
+  </script>
+  <script src="admin.js"></script>
 </body>
 
 </html>
