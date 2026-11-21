@@ -9,8 +9,7 @@ window.appConfig = {
        measurementId: process.env.FIREBASE_MEASUREMENT_ID
     },
     backendEmail: {
-        enabled: true,
-        // Replace <your-vercel-project> with the actual Vercel deployment domain
-        sendFeedbackUrl: 'https://teclipse-11.vercel.app/api/sendFeedback'
-    }
+    enabled: true,
+    sendFeedbackUrl: '/api/sendFeedback'
+  }
 };
